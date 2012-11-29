@@ -51,6 +51,7 @@ include $(CHIBIOS)/os/hal/platforms/BCM2835/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARM/BCM2835/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
+include /home/robu/UbuntuOne/lmatrixtest/lcomatrix/lcomatrix.mk
 
 # Define linker script file here
 LDSCRIPT= $(PORTLD)/BCM2835.ld
@@ -64,8 +65,7 @@ CSRC = $(PORTSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
        $(CHIBIOS)/os/various/evtimer.c \
-       $(CHIBIOS)/os/various/chprintf.c \
-       $(CHIBIOS)/os/various/syscalls.c
+       $(CHIBIOS)/os/various/chprintf.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -73,7 +73,7 @@ CSRC = $(PORTSRC) \
 CPPSRC = $(CHIBIOS)/os/various/ch.cpp \
           main.cpp \
           $(CHIBIOS)/os/contrib/Print.cpp \
-          
+          $(LCOMSRC)
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
@@ -102,7 +102,8 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) \
          $(CHIBIOS)/os/various \
          $(CHIBIOS)/os/contrib \
-         /home/robu/UbuntuOne/PMPCToolbox
+         $(MATRIXINC)
+
 #
 # Project, sources and paths
 ##############################################################################
@@ -129,7 +130,7 @@ HEX  = $(CP) -O ihex
 BIN  = $(CP) -O binary
 
 # ARM-specific options here
-AOPT = 
+AOPT = -lstdc++
 
 # THUMB-specific options here
 TOPT = -mthumb -DTHUMB 
@@ -149,7 +150,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all default C defines here, like -D_DEBUG=1
-DDEFS = -DCHIBIOS_DEBUG -DCHIBIOS
+DDEFS =
 
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =
@@ -161,7 +162,7 @@ DINCDIR =
 DLIBDIR =
 
 # List all default libraries here
-DLIBS = #-lstdc++ 
+DLIBS =
 
 #
 # End of default section

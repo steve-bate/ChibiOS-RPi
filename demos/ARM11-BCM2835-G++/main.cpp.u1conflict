@@ -22,13 +22,11 @@
 #include "hal.h"
 #include "chprintf.h"
 #include "Matrix"
-#include "ERRORH"
 
 //#include "lcomatrix.h"
 using namespace chibios_rt;
 using namespace PMPC;
 
-extern BaseSequentialStream * MSD1;
 /*
  * Application entry point.
  */
@@ -42,25 +40,21 @@ int main(void) {
 	 */
 	halInit();
 	System::Init();
-
+	vector < int > vIntVector( 1, 7 );
 	/*
 	 * Activates the serial driver using the driver default configuration.
 	 */
 	sdStart(&SD1, NULL);
 	chprintf((BaseSequentialStream *) &SD1, "MPC test");
 
-	MSD1 = (BaseSequentialStream *) &SD1;
-	ERRORH::throwerror("asa");
-
-
 	Matrix<double> DeltaU(3, 1);
-	Matrix<double> Delta(DeltaU);
+	//Matrix<double> Delta(DeltaU);
 	//MSD1 = (BaseSequentialStream *) &SD1;
-	//DeltaU.print();
+	DeltaU.print();
 	/*Matrix<double> R = 1e-5
-	 * Matrix<double>::Identity(mySysMat.C.rows() * 3,
-	 mySysMat.C.rows() * nc);
-	 Matrix<double> Q = 1e4 * Matrix<double>::Identity(np, np);*/
+			* Matrix<double>::Identity(mySysMat.C.rows() * 3,
+					mySysMat.C.rows() * nc);
+	Matrix<double> Q = 1e4 * Matrix<double>::Identity(np, np);*/
 
 	return 0;
 }

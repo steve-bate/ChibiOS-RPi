@@ -57,7 +57,7 @@ SECTIONS
         *(.dtors)
     } > ram
 
-    .ARM.extab : {*(.ARM.extab* .gnu.linkonce.armextab.*)}
+    .ARM.extab : {*(.ARM.extab* .gnu.linkonce.armextab.*)} > ram
 
     __exidx_start = .;
     .ARM.exidx : {*(.ARM.exidx* .gnu.linkonce.armexidx.*)} > ram

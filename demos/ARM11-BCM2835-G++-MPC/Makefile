@@ -121,7 +121,7 @@ CPPC = $(TRGT)g++
 # NOTE: You can use C++ even without C++ support if you are careful. C++
 #       runtime support makes code size explode.
 LD   = $(TRGT)gcc
-LD   = $(TRGT)g++
+#LD   = $(TRGT)g++
 CP   = $(TRGT)objcopy
 AS   = $(TRGT)gcc -x assembler-with-cpp
 OD   = $(TRGT)objdump
@@ -135,7 +135,7 @@ AOPT =
 TOPT = -mthumb -DTHUMB 
 
 # Define C warning options here
-CWARN = -Wall -Wextra -Wstrict-prototypes  
+CWARN = -Wall -Wextra -Wstrict-prototypes 
 
 # Define C++ warning options here
 CPPWARN = -Wall -Wextra 
@@ -161,7 +161,7 @@ DINCDIR =
 DLIBDIR =
 
 # List all default libraries here
-DLIBS = #-lstdc++ 
+DLIBS = -lstdc++ 
 
 #
 # End of default section

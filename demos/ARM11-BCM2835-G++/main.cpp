@@ -48,7 +48,7 @@ int main(void) {
 	 */
 	sdStart(&SD1, NULL);
 	chprintf((BaseSequentialStream *) &SD1, "MPC test");
-
+	
 	MSD1 = (BaseSequentialStream *) &SD1;
 	ERRORH::throwerror("asa");
 

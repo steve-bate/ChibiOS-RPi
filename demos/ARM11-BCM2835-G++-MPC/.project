@@ -77,6 +77,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>PMPCToolbox</name>
+			<type>2</type>
+			<location>/home/robu/UbuntuOne/PMPCToolbox</location>
+		</link>
+		<link>
 			<name>board</name>
 			<type>2</type>
 			<location>/home/robu/UbuntuOne/ChibiOS-RPi/boards/RASPBERRYPI_MODB</location>

@@ -177,7 +177,7 @@ int main(void) {
 	/*
 	 * Creates the blinker thread.
 	 */
-	chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+	chThdCreateStatic(waThread1, sizeof(waThread1), ABSPRIO, Thread1, NULL);
 
 	/*
 	 * Events servicing loop.

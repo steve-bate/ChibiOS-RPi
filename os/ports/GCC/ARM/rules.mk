@@ -8,7 +8,7 @@ ifeq ($(BUILDDIR),.)
   BUILDDIR = build
 endif
 OUTFILES = $(BUILDDIR)/$(PROJECT).elf $(BUILDDIR)/$(PROJECT).hex \
-           $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT).dmp
+           $(BUILDDIR)/$(PROJECT).img $(BUILDDIR)/$(PROJECT).dmp
 
 # Automatic compiler options
 OPT = $(USE_OPT)
@@ -190,7 +190,7 @@ else
 	@$(HEX) $< $@
 endif
 
-%.bin: %.elf $(LDSCRIPT)
+%.img: %.elf $(LDSCRIPT)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(BIN) $< $@
 else

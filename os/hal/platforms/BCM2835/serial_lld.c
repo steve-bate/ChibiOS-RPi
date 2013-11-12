@@ -57,9 +57,9 @@ static const SerialConfig default_config = {
 /*===========================================================================*/
 
 static void output_notify(GenericQueue *qp) {
-  UNUSED(qp);  
+  UNUSED(qp);
   /* Enable tx interrupts.*/
-  AUX_MU_IER_REG |= AUX_MU_IER_TX_IRQEN; 
+  AUX_MU_IER_REG |= AUX_MU_IER_TX_IRQEN;
 }
 
 /*===========================================================================*/
@@ -70,7 +70,7 @@ void sd_lld_serve_interrupt( SerialDriver *sdp ) {
   if (AUX_MU_IIR_RX_IRQ) {
     chSysLockFromIsr();
     while(!AUX_MU_LSR_RX_RDY);
-    do {	
+    do {
       sdIncomingDataI(sdp, AUX_MU_IO_REG & 0xFF);
     } while (AUX_MU_LSR_RX_RDY);
     chSysUnlockFromIsr();
@@ -82,7 +82,7 @@ void sd_lld_serve_interrupt( SerialDriver *sdp ) {
     msg_t data = sdRequestDataI(sdp);
     if (data < Q_OK) {
       /* Disable tx interrupts.*/
-      AUX_MU_IER_REG &= ~AUX_MU_IER_TX_IRQEN; 
+      AUX_MU_IER_REG &= ~AUX_MU_IER_TX_IRQEN;
     }
     else {
       mini_uart_send((uint32_t)data);
@@ -121,15 +121,15 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
     config = &default_config;
 
   IRQ_DISABLE1 = BIT(29);
-	
+
   AUX_ENABLES = 1;
-  
+
   AUX_MU_IER_REG  = 0x00;
   AUX_MU_CNTL_REG = 0x00;
   AUX_MU_LCR_REG  = 0x03; // Bit 1 must be set
   AUX_MU_MCR_REG  = 0x00;
   AUX_MU_IER_REG  = 0x05;
-  AUX_MU_IIR_REG  = 0xC6; 
+  AUX_MU_IIR_REG  = 0xC6;
   AUX_MU_BAUD_REG = BAUD_RATE_COUNT(config->baud_rate);
 
   bcm2835_gpio_fnsel(14, GPFN_ALT5);
@@ -140,10 +140,11 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
   GPPUDCLK0 = (1<<14)|(1<<15);
   bcm2835_delay(150);
   GPPUDCLK0 = 0;
-  
+
   AUX_MU_CNTL_REG = 0x03;
 
   IRQ_ENABLE1 = BIT(29);
+  bcm2835_delay(150);
 }
 
 /**
@@ -192,8 +193,8 @@ void mini_uart_sendhex ( uint32_t d, bool_t newline )
     rb-=4;
     rc=(d>>rb)&0xF;
     if(rc>9)
-      rc+=0x37; 
-    else 
+      rc+=0x37;
+    else
       rc+=0x30;
     mini_uart_send(rc);
     if(rb==0) break;

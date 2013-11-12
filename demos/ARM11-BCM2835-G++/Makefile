@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16  
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -15,7 +15,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti -fno-exceptions  
+  USE_CPPOPT = -fno-rtti -fno-exceptions
 endif
 
 # Enable this if you want the linker to remove unused code and data
@@ -64,16 +64,16 @@ CSRC = $(PORTSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
        $(CHIBIOS)/os/various/evtimer.c \
-       $(CHIBIOS)/os/various/chprintf.c \
-       $(CHIBIOS)/os/various/syscalls.c
+       $(CHIBIOS)/os/various/chprintf.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(CHIBIOS)/os/various/ch.cpp \
           main.cpp \
-          $(CHIBIOS)/os/contrib/Print.cpp \
-          
+          $(CHIBIOS)/os/contrib/Adafruit_GFX.cpp \
+          $(CHIBIOS)/os/contrib/Adafruit_HX8340B.cpp \
+          $(CHIBIOS)/os/contrib/Print.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
@@ -101,8 +101,8 @@ ASMSRC = $(PORTASM)
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) \
          $(CHIBIOS)/os/various \
-         $(CHIBIOS)/os/contrib \
-         /home/robu/UbuntuOne/PMPCToolbox
+         $(CHIBIOS)/os/contrib
+
 #
 # Project, sources and paths
 ##############################################################################
@@ -111,7 +111,7 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
 # Compiler settings
 #
 
-MCU  =  arm1176jzf-s
+MCU  = arm7tdmi
 
 #TRGT = arm-elf-
 TRGT = arm-none-eabi-
@@ -129,16 +129,16 @@ HEX  = $(CP) -O ihex
 BIN  = $(CP) -O binary
 
 # ARM-specific options here
-AOPT = 
+AOPT =
 
 # THUMB-specific options here
-TOPT = -mthumb -DTHUMB 
+TOPT = -mthumb -DTHUMB
 
 # Define C warning options here
-CWARN = -Wall -Wextra -Wstrict-prototypes  
+CWARN = -Wall -Wextra -Wstrict-prototypes
 
 # Define C++ warning options here
-CPPWARN = -Wall -Wextra 
+CPPWARN = -Wall -Wextra
 
 #
 # Compiler settings
@@ -149,7 +149,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all default C defines here, like -D_DEBUG=1
-DDEFS = -DCHIBIOS_DEBUG -DCHIBIOS
+DDEFS =
 
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =
@@ -161,7 +161,7 @@ DINCDIR =
 DLIBDIR =
 
 # List all default libraries here
-DLIBS = -lstdc++ 
+DLIBS =
 
 #
 # End of default section

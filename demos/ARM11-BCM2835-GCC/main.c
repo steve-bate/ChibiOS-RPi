@@ -20,7 +20,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "test.h"
+//#include "test.h"
 #include "shell.h"
 #include "chprintf.h"
 
@@ -65,20 +65,20 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
 }
 
 static void cmd_test(BaseSequentialStream *chp, int argc, char *argv[]) {
-  Thread *tp;
+  //Thread *tp;
 
   UNUSED(argv);
   if (argc > 0) {
     chprintf(chp, "Usage: test\r\n");
     return;
   }
-  tp = chThdCreateFromHeap(NULL, TEST_WA_SIZE, chThdGetPriority(),
+  /*tp = chThdCreateFromHeap(NULL, TEST_WA_SIZE, chThdGetPriority(),
                            TestThread, chp);
   if (tp == NULL) {
     chprintf(chp, "out of memory\r\n");
     return;
   }
-  chThdWait(tp);
+  chThdWait(tp);*/
 }
 
 #endif // EXTENDED_SHELL

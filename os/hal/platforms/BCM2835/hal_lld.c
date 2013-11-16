@@ -108,6 +108,10 @@ static void systimer_serve_interrupt(void) {
 	gpt_lld_serve_interrupt();
 #endif
 
+#if HAL_USE_EXT
+	ext_lld_serve_interrupt(&EXTD1);
+#endif
+
 	CH_IRQ_EPILOGUE();
 }
 

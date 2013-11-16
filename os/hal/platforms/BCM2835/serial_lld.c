@@ -144,11 +144,11 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 	//There are insufficient register description
 	AUX_MU_IER_REG = 0x01;
 
-	GPPUD = 0;
+	GPIO_REGS.GPPUD[0] = 0;
 	bcm2835_delay(150);
-	GPPUDCLK0 = (1 << 14) | (1 << 15);
+	GPIO_REGS.GPPUDCLK[0] = (1 << 14) | (1 << 15);
 	bcm2835_delay(150);
-	GPPUDCLK0 = 0;
+	GPIO_REGS.GPPUDCLK[0] = 0;
 
 	AUX_MU_CNTL_REG = 0x03;
 

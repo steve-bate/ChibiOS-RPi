@@ -4,7 +4,7 @@
 #include "chtypes.h"
 
 /* Note: Also see https://github.com/dwelch67/raspberrypi for more information about interfacing to
-   BCM2825 peripherals.*/
+ BCM2825 peripherals.*/
 
 #define REG(x) (*(volatile uint32_t *)(x))
 #define BIT(n) (1 << (n))
@@ -16,67 +16,35 @@
 // *****************************************************************************
 
 // -------- GPIO Registers --------
-#define GPIO_BASE 0x20200000UL
+typedef struct {
+	uint32_t GPFSEL[6];
+	uint32_t Reserved_1;
+	uint32_t GPSET[2];
+	uint32_t Reserved_2;
+	uint32_t GPCLR[2];
+	uint32_t Reserved_3;
+	uint32_t GPLEV[2];
+	uint32_t Reserved_4;
+	uint32_t GPEDS[2];
+	uint32_t Reserved_5;
+	uint32_t GPREN[2];
+	uint32_t Reserved_6;
+	uint32_t GPFEN[2];
+	uint32_t Reserved_7;
+	uint32_t GPHEN[2];
+	uint32_t Reserved_8;
+	uint32_t GPLEN[2];
+	uint32_t Reserved_9;
+	uint32_t GPAREN[2];
+	uint32_t Reserved_A;
+	uint32_t GPAFEN[2];
+	uint32_t Reserved_B;
+	uint32_t GPPUD[1];
+	uint32_t GPPUDCLK[2];
+//Ignoring the reserved and test bytes
+} GPIO_REGS_;
 
-#define GPFSEL0    REG(GPIO_BASE)
-#define GPFSEL1    REG(GPIO_BASE+1*4)
-#define GPFSEL2    REG(GPIO_BASE+2*4)
-#define GPFSEL3    REG(GPIO_BASE+3*4)
-#define GPFSEL4    REG(GPIO_BASE+4*4)
-#define GPFSEL5    REG(GPIO_BASE+5*4)
-
-#define GPSET0     REG(GPIO_BASE+7*4)
-#define GPSET1     REG(GPIO_BASE+8*4)
-
-#define GPCLR0     REG(GPIO_BASE+10*4)
-#define GPCLR1     REG(GPIO_BASE+11*4)
-
-#define GPLEV0     REG(GPIO_BASE+13*4)
-#define GPLEV1     REG(GPIO_BASE+14*4)
-
-#define GPEDS0     REG(GPIO_BASE+16*4)
-#define GPEDS1     REG(GPIO_BASE+17*4)
-
-#define GPREN0     REG(GPIO_BASE+19*4)
-#define GPREN1     REG(GPIO_BASE+20*4)
-
-#define GPFEN0     REG(GPIO_BASE+22*4)
-#define GPFEN1     REG(GPIO_BASE+23*4)
-
-#define GPHEN0     REG(GPIO_BASE+25*4)
-#define GPHEN1     REG(GPIO_BASE+26*4)
-
-#define GPLEN0     REG(GPIO_BASE+28*4)
-#define GPLEN1     REG(GPIO_BASE+29*4)
-
-#define GPAREN0    REG(GPIO_BASE+31*4)
-#define GPAREN1    REG(GPIO_BASE+32*4)
-
-#define GPAFEN0    REG(GPIO_BASE+34*4)
-#define GPAFEN1    REG(GPIO_BASE+35*4)
-
-#define GPPUD      REG(GPIO_BASE+37*4)
-#define GPPUDCLK0  REG(GPIO_BASE+38*4)
-#define GPPUDCLK1  REG(GPIO_BASE+39*4)
-
-
-/*#define GPSET0  	REG(0x2020001C)
-#define GPSET1  	REG(0x20200020)
-#define GPCLR0  	REG(0x20200028)
-#define GPCLR1  	REG(0x2020002C)
-#define GPLEV0		REG(0x20200034)
-#define GPLEV1		REG(0x20200038)
-
-#define GPFSEL0 	REG(0x20200000)
-#define GPFSEL1 	REG(0x20200004)
-#define GPFSEL2 	REG(0x20200008)
-#define GPFSEL3 	REG(0x2020000C)
-#define GPFSEL4 	REG(0x20200010)
-#define GPFSEL6 	REG(0x20200014)
-
-#define GPPUD           REG(0x20200094)
-#define GPPUDCLK0       REG(0x20200098)
-#define GPPUDCLK1       REG(0x2020009C)*/
+#define GPIO_REGS  (*(( volatile GPIO_REGS_ *) 0x20200000UL))
 
 #define GPIO_PUD_OFF      0x00
 #define GPIO_PUD_TRISTATE 0x00
@@ -92,6 +60,14 @@
 #define GPFN_ALT3  	0x07
 #define GPFN_ALT4  	0x03
 #define GPFN_ALT5  	0x02
+
+#define DETECT_NONE 			0x00
+#define DETECT_RISING 			0x01
+#define DETECT_FALLING 			0x02
+#define DETECT_HIGH 			0x03
+#define DETECT_LOW 				0x04
+#define DETECT_RISING_ASYNC 	0x05
+#define DETECT_FALLING_ASYNC 	0x06
 
 #define GPIO0_PAD       0
 #define GPIO1_PAD       1
@@ -295,14 +271,14 @@
 // *****************************************************************************
 
 struct bscdevice_t {
-  volatile unsigned int control;
-  volatile unsigned int status;
-  volatile unsigned int dataLength;
-  volatile unsigned int slaveAddress;
-  volatile unsigned int dataFifo;
-  volatile unsigned int clockDivider;
-  volatile unsigned int dataDelay;
-  volatile unsigned int clockStretchTimeout;
+	volatile unsigned int control;
+	volatile unsigned int status;
+	volatile unsigned int dataLength;
+	volatile unsigned int slaveAddress;
+	volatile unsigned int dataFifo;
+	volatile unsigned int clockDivider;
+	volatile unsigned int dataDelay;
+	volatile unsigned int clockStretchTimeout;
 };
 
 typedef struct bscdevice_t bscdevice_t;
@@ -414,10 +390,10 @@ typedef struct bscdevice_t bscdevice_t;
 #define GPIO0_CLK_DIV  REG(0x201010A4)
 
 // *****************************************************************************
-//       Power Management, Reset controller and Watchdog registers 
+//       Power Management, Reset controller and Watchdog registers
 // *****************************************************************************
 
-#define PM_BASE                  (0x20100000) 
+#define PM_BASE                  (0x20100000)
 #define PM_RSTC                  REG(PM_BASE+0x1c)
 #define PM_WDOG                  REG(PM_BASE+0x24)
 
@@ -432,16 +408,17 @@ typedef struct bscdevice_t bscdevice_t;
 // *****************************************************************************
 //                 Support Functions
 // *****************************************************************************
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  void bcm2835_gpio_fnsel(uint32_t gpio_pin, uint32_t gpio_function);
-  void bcm2835_delay(uint32_t n);
-
+void bcm2835_gpio_fnsel(uint8_t gpio_pin, uint8_t gpio_function);
+void bcm2835_delay(uint32_t n);
+void set_gpio_direction(uint8_t pin_nr, uint8_t dir);
+void set_gpio(uint8_t pin_nr, uint8_t pinVal);
+uint32_t read_gpio(uint8_t pin_nr);
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif

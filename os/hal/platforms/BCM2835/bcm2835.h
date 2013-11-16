@@ -16,7 +16,51 @@
 // *****************************************************************************
 
 // -------- GPIO Registers --------
-#define GPSET0  	REG(0x2020001C)
+#define GPIO_BASE 0x20200000UL
+
+#define GPFSEL0    REG(GPIO_BASE)
+#define GPFSEL1    REG(GPIO_BASE+1*4)
+#define GPFSEL2    REG(GPIO_BASE+2*4)
+#define GPFSEL3    REG(GPIO_BASE+3*4)
+#define GPFSEL4    REG(GPIO_BASE+4*4)
+#define GPFSEL5    REG(GPIO_BASE+5*4)
+
+#define GPSET0     REG(GPIO_BASE+7*4)
+#define GPSET1     REG(GPIO_BASE+8*4)
+
+#define GPCLR0     REG(GPIO_BASE+10*4)
+#define GPCLR1     REG(GPIO_BASE+11*4)
+
+#define GPLEV0     REG(GPIO_BASE+13*4)
+#define GPLEV1     REG(GPIO_BASE+14*4)
+
+#define GPEDS0     REG(GPIO_BASE+16*4)
+#define GPEDS1     REG(GPIO_BASE+17*4)
+
+#define GPREN0     REG(GPIO_BASE+19*4)
+#define GPREN1     REG(GPIO_BASE+20*4)
+
+#define GPFEN0     REG(GPIO_BASE+22*4)
+#define GPFEN1     REG(GPIO_BASE+23*4)
+
+#define GPHEN0     REG(GPIO_BASE+25*4)
+#define GPHEN1     REG(GPIO_BASE+26*4)
+
+#define GPLEN0     REG(GPIO_BASE+28*4)
+#define GPLEN1     REG(GPIO_BASE+29*4)
+
+#define GPAREN0    REG(GPIO_BASE+31*4)
+#define GPAREN1    REG(GPIO_BASE+32*4)
+
+#define GPAFEN0    REG(GPIO_BASE+34*4)
+#define GPAFEN1    REG(GPIO_BASE+35*4)
+
+#define GPPUD      REG(GPIO_BASE+37*4)
+#define GPPUDCLK0  REG(GPIO_BASE+38*4)
+#define GPPUDCLK1  REG(GPIO_BASE+39*4)
+
+
+/*#define GPSET0  	REG(0x2020001C)
 #define GPSET1  	REG(0x20200020)
 #define GPCLR0  	REG(0x20200028)
 #define GPCLR1  	REG(0x2020002C)
@@ -32,7 +76,7 @@
 
 #define GPPUD           REG(0x20200094)
 #define GPPUDCLK0       REG(0x20200098)
-#define GPPUDCLK1       REG(0x2020009C)
+#define GPPUDCLK1       REG(0x2020009C)*/
 
 #define GPIO_PUD_OFF      0x00
 #define GPIO_PUD_TRISTATE 0x00
@@ -223,8 +267,8 @@
 
 #define AUX_MU_IER_TX_IRQEN  BIT(1)
 
-#define AUX_MU_IIR_RX_IRQ     ((AUX_MU_IIR_REG & 0x07) == 0x04)
-#define AUX_MU_IIR_TX_IRQ     ((AUX_MU_IIR_REG & 0x07) == 0x02)
+#define AUX_MU_IIR_RX_IRQ     ((AUX_MU_IIR_REG & 0x06) == 0x04)
+#define AUX_MU_IIR_TX_IRQ     ((AUX_MU_IIR_REG & 0x06) == 0x02)
 
 #define AUX_MU_LSR_RX_RDY     (AUX_MU_LSR_REG & BIT(0))
 #define AUX_MU_LSR_TX_RDY     (AUX_MU_LSR_REG & BIT(5))
@@ -252,7 +296,7 @@
 
 struct bscdevice_t {
   volatile unsigned int control;
-  volatile unsigned int status; 
+  volatile unsigned int status;
   volatile unsigned int dataLength;
   volatile unsigned int slaveAddress;
   volatile unsigned int dataFifo;

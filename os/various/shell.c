@@ -284,7 +284,7 @@ bool_t shellGetLine(BaseSequentialStream *chp, char *line, unsigned size) {
       chSequentialStreamPut(chp, c);
       *p++ = (char)c;
     }
-	}
+  }
 }
 
 /** @} */

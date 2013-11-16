@@ -1,22 +1,22 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+ ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+ 2011,2012 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+ This file is part of ChibiOS/RT.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+ ChibiOS/RT is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ ChibiOS/RT is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * @file    BCM2835/pal_lld.h
@@ -40,20 +40,27 @@
 /*===========================================================================*/
 
 typedef struct {
-  /**
-   * @brief   GPIO_LATCH register.
-   * @details This register represents the output latch of the GPIO port.
-   */
-  uint32_t          latch;
+	/**
+	 * @brief   GPIO_LATCH register.
+	 * @details This register represents the output latch of the GPIO port.
+	 */
+	uint32_t latch;
 
-  volatile uint32_t *gpset;
-  volatile uint32_t *gpclr;
-  volatile uint32_t *gplev;
-  volatile uint32_t *gppudclk;
-  unsigned int pin_base;
-  
-} gpio_port_t;
+	volatile uint32_t *gpset;
+	volatile uint32_t *gpclr;
+	volatile uint32_t *gplev;
+	volatile uint32_t *gppudclk;
+	volatile uint32_t *gpeds;
+	volatile uint32_t *gpren;
+	volatile uint32_t *gpfen;
+	volatile uint32_t *gphen;
+	volatile uint32_t *gplen;
+	volatile uint32_t *gparen;
+	volatile uint32_t *gpafen;
+	volatile uint32_t *gpud;
+	unsigned int pin_base;
 
+}gpio_port_t;
 
 /**
  * @brief   Generic I/O ports static initializer.
@@ -66,7 +73,7 @@ typedef struct {
  */
 typedef struct {
 
-} PALConfig;
+}PALConfig;
 
 /**
  * @brief   Width, in bits, of an I/O port.
@@ -157,7 +164,6 @@ extern const PALConfig pal_default_config;
  */
 #define pal_lld_writeport(port, bits) _pal_lld_writeport(port, bits)
 
-
 /**
  * @brief   Pads group mode setup.
  * @details This function programs a pads group belonging to the same port
@@ -177,15 +183,15 @@ extern const PALConfig pal_default_config;
 extern "C" {
 #endif
 
-  void _pal_lld_init(const PALConfig* config);
-  
-  void _pal_lld_setgroupmode(ioportid_t port,
-                             ioportmask_t mask,
-                             iomode_t mode);
+	void _pal_lld_init(const PALConfig* config);
 
-  void _pal_lld_writeport(ioportid_t port, 
-  			  ioportmask_t bits);
-  						  
+	void _pal_lld_setgroupmode(ioportid_t port,
+			ioportmask_t mask,
+			iomode_t mode);
+
+	void _pal_lld_writeport(ioportid_t port,
+			ioportmask_t bits);
+
 #ifdef __cplusplus
 }
 #endif

@@ -137,8 +137,10 @@ void _ext_lld_serve_interrupt(EXTDriver *extp)
 	{
 		if( detect_gpio_interrupt(a) && extp->config->channels[a].cb != NULL )
 		{
+			chSysLockFromIsr();
 			clear_gpio_interrupt(a);
 			extp->config->channels[a].cb(extp, a);
+			chSysUnlockFromIsr();
 		}
 	}
 }

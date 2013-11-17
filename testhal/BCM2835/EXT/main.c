@@ -30,9 +30,8 @@ static msg_t Thread1(void *p)
 	while (1)
 	{
 		chThdSleepMilliseconds(1000);
-		palSetPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
-		chThdSleepMilliseconds(1000);
 		palClearPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
+		chThdSleepMilliseconds(1000);
 		palClearPad(GPIO4_PORT, GPIO4_PAD);
 	}
 	return 0;
@@ -44,7 +43,7 @@ static void GPIO25Callback(EXTDriver *extp, expchannel_t channel)
 	UNUSED(channel);
 	mini_uart_sendhex(channel, TRUE);
 	palSetPad(GPIO4_PORT, GPIO4_PAD);
-
+	palSetPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
 }
 
 static EXTConfig extconf =

@@ -89,8 +89,8 @@ void enable_gpio_detect(uint8_t pin_nr, uint8_t type)
  */
 void enable_bank_interrupt(uint8_t pin_nr)
 {
-	//uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 |= 1 <<17;
+	uint32_t offset = pin_nr / 32;
+	IRQ_ENABLE2 |= 1 <<(17+offset);
 }
 
 /*
@@ -98,8 +98,8 @@ void enable_bank_interrupt(uint8_t pin_nr)
  */
 void disable_bank_interrupt(uint8_t pin_nr)
 {
-	//uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 ^= 1 <<(17);
+	uint32_t offset = pin_nr / 32;
+	IRQ_ENABLE2 ^= 1 <<(17+offset);
 
 }
 /*

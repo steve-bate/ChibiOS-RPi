@@ -137,10 +137,8 @@ void _ext_lld_serve_interrupt(EXTDriver *extp)
 	{
 		if( detect_gpio_interrupt(a) && extp->config->channels[a].cb != NULL )
 		{
-			chSysLockFromIsr();
 			clear_gpio_interrupt(a);
 			extp->config->channels[a].cb(extp, a);
-			chSysUnlockFromIsr();
 		}
 	}
 }
@@ -234,7 +232,9 @@ void ext_lld_channel_disable(EXTDriver *extp, expchannel_t channel)
  */
 void ext_lld_serve_interrupt(EXTDriver *extp)
 {
+	chSysLockFromIsr();
 	_ext_lld_serve_interrupt(extp);
+	chSysUnlockFromIsr();
 }
 
 #endif /* HAL_USE_EXT */

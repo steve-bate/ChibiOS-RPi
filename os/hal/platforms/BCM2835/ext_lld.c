@@ -89,8 +89,8 @@ void enable_gpio_detect(uint8_t pin_nr, uint8_t type)
  */
 void enable_bank_interrupt(uint8_t pin_nr)
 {
-	uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 |= 1 <<18;
+	//uint32_t offset = pin_nr / 32;
+	IRQ_ENABLE2 |= 1 <<17;
 }
 
 /*
@@ -98,8 +98,9 @@ void enable_bank_interrupt(uint8_t pin_nr)
  */
 void disable_bank_interrupt(uint8_t pin_nr)
 {
-	uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 ^= 1 <<(18);
+	//uint32_t offset = pin_nr / 32;
+	IRQ_ENABLE2 ^= 1 <<(17);
+
 }
 /*
  *
@@ -132,14 +133,13 @@ uint32_t detect_gpio_interrupt(uint8_t pin_nr)
 void _ext_lld_serve_interrupt(EXTDriver *extp)
 {
 	uint8_t a;
-	//for(a=0; a<EXT_MAX_CHANNELS; ++a)
+	for(a=0; a<EXT_MAX_CHANNELS; ++a)
 	{
-		if( detect_gpio_interrupt(25))
+		if( detect_gpio_interrupt(a) && extp->config->channels[a].cb != NULL )
 		{
-			clear_gpio_interrupt(25);
-			extp->config->channels[25].cb(extp, 25);
+			clear_gpio_interrupt(a);
+			extp->config->channels[a].cb(extp, a);
 		}
-
 	}
 }
 
@@ -173,10 +173,10 @@ void ext_lld_init(void)
 void ext_lld_start(EXTDriver *extp)
 {
 	uint8_t a;
-	//for(a=0; a<EXT_MAX_CHANNELS; ++a)
+	for(a=0; a<EXT_MAX_CHANNELS; ++a)
 	{
-		//if( extp->config->channels[25].mode != DETECT_NONE )
-		ext_lld_channel_enable(extp,25);
+		if( extp->config->channels[a].mode )
+		ext_lld_channel_enable(extp,a);
 	}
 }
 
@@ -191,10 +191,10 @@ void ext_lld_stop(EXTDriver *extp)
 {
 
 	uint8_t a;
-	//for(a=0; a<EXT_MAX_CHANNELS; ++a)
+	for(a=0; a<EXT_MAX_CHANNELS; ++a)
 	{
-		//if( extp->config->channels[a].mode !=DETECT_NONE)
-		ext_lld_channel_disable(extp, 25);
+		if( extp->config->channels[a].mode)
+		ext_lld_channel_disable(extp, a);
 	}
 }
 
@@ -208,9 +208,9 @@ void ext_lld_stop(EXTDriver *extp)
  */
 void ext_lld_channel_enable(EXTDriver *extp, expchannel_t channel)
 {
-	set_gpio_direction(25, GPFN_IN);
-	enable_gpio_detect(25, DETECT_FALLING);
-	enable_bank_interrupt(25);
+	set_gpio_direction(channel, GPFN_IN);
+	enable_gpio_detect(channel, extp->config->channels[channel].mode);
+	enable_bank_interrupt(channel);
 }
 
 /**
@@ -224,7 +224,7 @@ void ext_lld_channel_enable(EXTDriver *extp, expchannel_t channel)
 void ext_lld_channel_disable(EXTDriver *extp, expchannel_t channel)
 {
 	UNUSED(extp);
-	disable_bank_interrupt(25);
+	disable_bank_interrupt(channel);
 }
 /*
  *

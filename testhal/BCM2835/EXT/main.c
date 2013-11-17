@@ -29,9 +29,11 @@ static msg_t Thread1(void *p)
 	chRegSetThreadName("blinker");
 	while (1)
 	{
+		chThdSleepMilliseconds(1000);
 		palSetPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
+		chThdSleepMilliseconds(1000);
 		palClearPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
-		chThdSleepMilliseconds(2000);
+		palClearPad(GPIO4_PORT, GPIO4_PAD);
 	}
 	return 0;
 }
@@ -40,48 +42,48 @@ static void GPIO25Callback(EXTDriver *extp, expchannel_t channel)
 {
 	UNUSED(extp);
 	UNUSED(channel);
+	mini_uart_sendhex(channel, TRUE);
 	palSetPad(GPIO4_PORT, GPIO4_PAD);
-	palClearPad(GPIO4_PORT, GPIO4_PAD);
+
 }
 
 static EXTConfig extconf =
-{
-{
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_FALLING, GPIO25Callback },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL },
-{ DETECT_NONE, NULL }
-}
+	{
+		{
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_FALLING, GPIO25Callback },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL },
+			{ DETECT_NONE, NULL } }
 
-};
+	};
 /*
  * Application entry point.
  */
@@ -97,8 +99,7 @@ int main(void)
 
 	palSetPadMode(ONBOARD_LED_PORT, ONBOARD_LED_PAD, PAL_MODE_OUTPUT);
 
-	palSetPadMode(GPIO4_PORT, GPIO4_PAD, PAL_MODE_OUTPUT);
-	palSetPad(GPIO4_PORT, GPIO4_PAD);
+	palSetPadMode(GPIO4_PORT, GPIO4_PAD, PAL_MODE_OUTPUT); palSetPad(GPIO4_PORT, GPIO4_PAD);
 	chprintf((BaseSequentialStream *) &SD1, "BCM2835 GPIO Ext set\r\n");
 
 	/*

@@ -50,7 +50,8 @@
  *
  * @notapi
  */
-static void systimer_init(void) {
+static void systimer_init(void)
+{
 	// 1 MHz clock, Counter=1000, 1 ms tick
 	ARM_TIMER_CTL = 0x003E0000;
 	ARM_TIMER_LOD = 1000 - 1;
@@ -67,8 +68,10 @@ static void systimer_init(void) {
  *
  * @notapi
  */
-static void systimer_serve_interrupt(void) {
-	if (ARM_TIMER_MIS & 1) {
+static void systimer_serve_interrupt(void)
+{
+	//if (ARM_TIMER_MIS & 1)
+	{
 		// Update the system time
 		chSysLockFromIsr()
 		;
@@ -87,7 +90,8 @@ static void systimer_serve_interrupt(void) {
 /**
  * @brief Interrupt handler
  *
- */CH_IRQ_HANDLER(IrqHandler) {
+ */CH_IRQ_HANDLER(IrqHandler)
+{
 	CH_IRQ_PROLOGUE();
 
 	systimer_serve_interrupt();
@@ -123,7 +127,8 @@ static void systimer_serve_interrupt(void) {
  * @brief Synchronize function for short delays.
  *
  */
-void delayMicroseconds(uint32_t n) {
+void delayMicroseconds(uint32_t n)
+{
 	uint32_t compare = SYSTIMER_CLO + n;
 	while (SYSTIMER_CLO < compare)
 		;
@@ -134,14 +139,16 @@ void delayMicroseconds(uint32_t n) {
  *
  * @notapi
  */
-void hal_lld_init(void) {
+void hal_lld_init(void)
+{
 	systimer_init();
 }
 
 /**
  * @brief Start watchdog timer
  */
-void watchdog_start(uint32_t timeout) {
+void watchdog_start(uint32_t timeout)
+{
 	/* Setup watchdog for reset */
 	uint32_t pm_rstc = PM_RSTC;
 
@@ -156,14 +163,16 @@ void watchdog_start(uint32_t timeout) {
 /**
  * @brief Start watchdog timer
  */
-void watchdog_stop(void) {
+void watchdog_stop(void)
+{
 	PM_RSTC = PM_PASSWORD | PM_RSTC_RESET;
 }
 
 /**
  * @brief Get remaining watchdog time.
  */
-uint32_t watchdog_get_remaining(void) {
+uint32_t watchdog_get_remaining(void)
+{
 	return PM_WDOG & PM_WDOG_TIME_SET;
 }
 

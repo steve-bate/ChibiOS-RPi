@@ -42,7 +42,7 @@ static void GPIO25Callback(EXTDriver *extp, expchannel_t channel)
 {
 	UNUSED(extp);
 	UNUSED(channel);
-	mini_uart_sendhex(channel, TRUE);
+	uart_sendhex(channel, TRUE);
 	palSetPad(GPIO4_PORT, GPIO4_PAD);
 	palSetPad(ONBOARD_LED_PORT, ONBOARD_LED_PAD);
 }

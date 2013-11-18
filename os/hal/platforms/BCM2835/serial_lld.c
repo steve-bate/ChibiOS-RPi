@@ -143,21 +143,21 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 
 	UART0_CR = 0;
 
-	ra = GPIO_GPFSEL1;
+	ra = GPIO_REGS.GPFSEL[1];
 	ra &= ~(7 << 12);
 	ra |= 4 << 12;
-	GPIO_GPFSEL1 = ra;
+	GPIO_REGS.GPFSEL[1] = ra;
 
 	//bcm2835_gpio_fnsel(14, GPFN_IN);
 	//bcm2835_gpio_fnsel(15, GPFN_IN);
 
-	GPIO_GPPUD = 0;
+	GPIO_REGS.GPPUD[0] = 0;
 
 	bcm2835_delay(150);
-	GPIO_GPPUDCLK0 = (3 << 14);
+	GPIO_REGS.GPPUDCLK[0] = (3 << 14);
 	bcm2835_delay(150);
 
-	GPIO_GPPUDCLK0 = 0;
+	GPIO_REGS.GPPUDCLK[0] = 0;
 
 	//Clearing the interruptions
 	UART0_ICR = 0x7FF;

@@ -226,17 +226,10 @@ typedef struct {
 //                         Serial Registers
 // *****************************************************************************
 
-//Testing delete later
-#define GPIO_BASE      *((volatile uint32 *)0x20200000UL)
-
-#define GPIO_GPFSEL0    REG(&GPIO_BASE)
-#define GPIO_GPFSEL1    REG(&GPIO_BASE + 1)
-#define GPIO_GPPUD      REG(&GPIO_BASE + 37)
-#define GPIO_GPPUDCLK0  REG(&GPIO_BASE + 38)
 //
 
 #define UART_CLOCK 3000000
-#define UART0_BASE   (*((volatile uint32 *)0x20201000UL))
+#define UART0_BASE   (*((volatile uint32_t *)0x20201000UL))
 
 #define UART0_DR     REG(&UART0_BASE)
 #define UART0_RSRECR REG(&UART0_BASE + 1)

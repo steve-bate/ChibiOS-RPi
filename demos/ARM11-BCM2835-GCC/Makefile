@@ -32,7 +32,7 @@ endif
 ifeq ($(USE_VERBOSE_COMPILE),)
   USE_VERBOSE_COMPILE = no
 endif
-
+EXTENDED_SHELL=yes
 #
 # Build global options
 ##############################################################################
@@ -42,7 +42,7 @@ endif
 #
 
 # Define project name here
-PROJECT = ch
+PROJECT = kernel
 
 # Imported source files and paths
 CHIBIOS = ../..
@@ -51,7 +51,7 @@ include $(CHIBIOS)/os/hal/platforms/BCM2835/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARM/BCM2835/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
-include $(CHIBIOS)/test/test.mk
+#include $(CHIBIOS)/test/test.mk
 
 # Define linker script file here
 LDSCRIPT= $(PORTLD)/BCM2835.ld

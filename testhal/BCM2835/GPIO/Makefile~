@@ -42,7 +42,7 @@ endif
 #
 
 # Define project name here
-PROJECT = kernel
+PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..

@@ -190,7 +190,7 @@ else
 	@$(HEX) $< $@
 endif
 
-%.img: %.elf $(LDSCRIPT)
+%.bin: %.elf $(LDSCRIPT)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(BIN) $< $@
 else

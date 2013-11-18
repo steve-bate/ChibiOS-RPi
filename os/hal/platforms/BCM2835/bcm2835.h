@@ -4,35 +4,89 @@
 #include "chtypes.h"
 
 /* Note: Also see https://github.com/dwelch67/raspberrypi for more information about interfacing to
-   BCM2825 peripherals.*/
-
-#define REG(x) (*(volatile uint32_t *)(x))
-#define BIT(n) (1 << (n))
+ BCM2825 peripherals.*/
 
 #define BCM2835_CLOCK_FREQ 250000000
+
+#define REG_PTR(x) (( volatile REG *)(x))
+struct BITS
+{
+	uint32_t BIT0 :1;
+	uint32_t BIT1 :1;
+	uint32_t BIT2 :1;
+	uint32_t BIT3 :1;
+	uint32_t BIT4 :1;
+	uint32_t BIT5 :1;
+	uint32_t BIT6 :1;
+	uint32_t BIT7 :1;
+	uint32_t BIT8 :1;
+	uint32_t BIT9 :1;
+	uint32_t BIT10 :1;
+	uint32_t BIT11 :1;
+	uint32_t BIT12 :1;
+	uint32_t BIT13 :1;
+	uint32_t BIT14 :1;
+	uint32_t BIT15 :1;
+	uint32_t BIT16 :1;
+	uint32_t BIT17 :1;
+	uint32_t BIT18 :1;
+	uint32_t BIT19 :1;
+	uint32_t BIT20 :1;
+	uint32_t BIT21 :1;
+	uint32_t BIT22 :1;
+	uint32_t BIT23 :1;
+	uint32_t BIT24 :1;
+	uint32_t BIT25 :1;
+	uint32_t BIT26 :1;
+	uint32_t BIT27 :1;
+	uint32_t BIT28 :1;
+	uint32_t BIT29 :1;
+	uint32_t BIT30 :1;
+	uint32_t BIT31 :1;
+
+};
+
+typedef union
+{
+	uint32_t REG;
+	struct BITS BIT;
+} REG;
 
 // *****************************************************************************
 //                        General Purpose I/O (GPIO)
 // *****************************************************************************
 
+
 // -------- GPIO Registers --------
-#define GPSET0  	REG(0x2020001C)
-#define GPSET1  	REG(0x20200020)
-#define GPCLR0  	REG(0x20200028)
-#define GPCLR1  	REG(0x2020002C)
-#define GPLEV0		REG(0x20200034)
-#define GPLEV1		REG(0x20200038)
+typedef struct {
+	REG GPFSEL[6];
+	REG Reserved_1;
+	REG GPSET[2];
+	REG Reserved_2;
+	REG GPCLR[2];
+	REG Reserved_3;
+	REG GPLEV[2];
+	REG Reserved_4;
+	REG GPEDS[2];
+	REG Reserved_5;
+	REG GPREN[2];
+	REG Reserved_6;
+	REG GPFEN[2];
+	REG Reserved_7;
+	REG GPHEN[2];
+	REG Reserved_8;
+	REG GPLEN[2];
+	REG Reserved_9;
+	REG GPAREN[2];
+	REG Reserved_A;
+	REG GPAFEN[2];
+	REG Reserved_B;
+	REG GPPUD[1];
+	REG GPPUDCLK[2];
+//Ignoring the reserved and test bytes
+} GPIO_REGS_;
 
-#define GPFSEL0 	REG(0x20200000)
-#define GPFSEL1 	REG(0x20200004)
-#define GPFSEL2 	REG(0x20200008)
-#define GPFSEL3 	REG(0x2020000C)
-#define GPFSEL4 	REG(0x20200010)
-#define GPFSEL6 	REG(0x20200014)
-
-#define GPPUD           REG(0x20200094)
-#define GPPUDCLK0       REG(0x20200098)
-#define GPPUDCLK1       REG(0x2020009C)
+#define GPIO_REGS  (( volatile GPIO_REGS_ *) 0x20200000UL)
 
 #define GPIO_PUD_OFF      0x00
 #define GPIO_PUD_TRISTATE 0x00
@@ -48,6 +102,14 @@
 #define GPFN_ALT3  	0x07
 #define GPFN_ALT4  	0x03
 #define GPFN_ALT5  	0x02
+
+#define DETECT_NONE 			0x00
+#define DETECT_RISING 			0x01
+#define DETECT_FALLING 			0x02
+#define DETECT_HIGH 			0x03
+#define DETECT_LOW 				0x04
+#define DETECT_RISING_ASYNC 	0x05
+#define DETECT_FALLING_ASYNC 	0x06
 
 #define GPIO0_PAD       0
 #define GPIO1_PAD       1
@@ -167,28 +229,28 @@
 //                          Timer (ARM Side)
 // *****************************************************************************
 
-#define ARM_TIMER_LOD REG(0x2000B400)
-#define ARM_TIMER_VAL REG(0x2000B404)
-#define ARM_TIMER_CTL REG(0x2000B408)
-#define ARM_TIMER_CLI REG(0x2000B40C)
-#define ARM_TIMER_RIS REG(0x2000B410)
-#define ARM_TIMER_MIS REG(0x2000B414)
-#define ARM_TIMER_RLD REG(0x2000B418)
-#define ARM_TIMER_DIV REG(0x2000B41C)
-#define ARM_TIMER_CNT REG(0x2000B420)
+#define ARM_TIMER_LOD REG_PTR(0x2000B400)
+#define ARM_TIMER_VAL REG_PTR(0x2000B404)
+#define ARM_TIMER_CTL REG_PTR(0x2000B408)
+#define ARM_TIMER_CLI REG_PTR(0x2000B40C)
+#define ARM_TIMER_RIS REG_PTR(0x2000B410)
+#define ARM_TIMER_MIS REG_PTR(0x2000B414)
+#define ARM_TIMER_RLD REG_PTR(0x2000B418)
+#define ARM_TIMER_DIV REG_PTR(0x2000B41C)
+#define ARM_TIMER_CNT REG_PTR(0x2000B420)
 
 // *****************************************************************************
 //                        System Timer
 // *****************************************************************************
 
-#define SYSTIMER_CS         REG(0x20003000)
-#define SYSTIMER_CLO        REG(0x20003004)
-#define SYSTIMER_CHI        REG(0x20003008)
+#define SYSTIMER_CS         REG_PTR(0x20003000)
+#define SYSTIMER_CLO        REG_PTR(0x20003004)
+#define SYSTIMER_CHI        REG_PTR(0x20003008)
 
-#define SYSTIMER_CMP0       REG(0x2000300C)
-#define SYSTIMER_CMP1       REG(0x20003010)
-#define SYSTIMER_CMP2       REG(0x20003014)
-#define SYSTIMER_CMP3       REG(0x20003018)
+#define SYSTIMER_CMP0       REG_PTR(0x2000300C)
+#define SYSTIMER_CMP1       REG_PTR(0x20003010)
+#define SYSTIMER_CMP2       REG_PTR(0x20003014)
+#define SYSTIMER_CMP3       REG_PTR(0x20003018)
 
 #define SYSTIMER_CS_MATCH0  0x01
 #define SYSTIMER_CS_MATCH1  0x02
@@ -203,28 +265,59 @@
 #define SYSTIMER_CLOCK_FREQ 1000000
 
 // *****************************************************************************
+//                         Serial Registers
+// *****************************************************************************
+
+//
+
+#define UART_CLOCK 3000000
+#define UART0_BASE   ((volatile unsigned long *)0x20201000UL)
+
+typedef struct
+{
+        REG IBRD;
+        REG FBRD;
+        REG LCRH;
+        REG CR;
+        REG IFLS;
+        REG IMSC;
+        REG RIS;
+        REG MIS;
+        REG ICR;
+        REG DMACR;
+} BCM2835_UART;
+
+
+#define UART  ((volatile BCM2835_UART *) (0x20201024UL))
+
+#define UART0_DR     REG_PTR(0x20201000UL)
+#define UART0_FR     REG_PTR(0x20201018UL)
+
+
+
+// *****************************************************************************
 //                         AUX Registers
 // *****************************************************************************
 
-#define AUX_ENABLES     REG(0x20215004)
+#define AUX_ENABLES     REG_PTR(0x20215004)
 
 // --- Mini UART Registers -----
-#define AUX_MU_IO_REG   REG(0x20215040)
-#define AUX_MU_IER_REG  REG(0x20215044)
-#define AUX_MU_IIR_REG  REG(0x20215048)
-#define AUX_MU_LCR_REG  REG(0x2021504C)
-#define AUX_MU_MCR_REG  REG(0x20215050)
-#define AUX_MU_LSR_REG  REG(0x20215054)
-#define AUX_MU_MSR_REG  REG(0x20215058)
-#define AUX_MU_SCRATCH  REG(0x2021505C)
-#define AUX_MU_CNTL_REG REG(0x20215060)
-#define AUX_MU_STAT_REG REG(0x20215064)
-#define AUX_MU_BAUD_REG REG(0x20215068)
+#define AUX_MU_IO_REG   REG_PTR(0x20215040)
+#define AUX_MU_IER_REG  REG_PTR(0x20215044)
+#define AUX_MU_IIR_REG  REG_PTR(0x20215048)
+#define AUX_MU_LCR_REG  REG_PTR(0x2021504C)
+#define AUX_MU_MCR_REG  REG_PTR(0x20215050)
+#define AUX_MU_LSR_REG  REG_PTR(0x20215054)
+#define AUX_MU_MSR_REG  REG_PTR(0x20215058)
+#define AUX_MU_SCRATCH  REG_PTR(0x2021505C)
+#define AUX_MU_CNTL_REG REG_PTR(0x20215060)
+#define AUX_MU_STAT_REG REG_PTR(0x20215064)
+#define AUX_MU_BAUD_REG REG_PTR(0x20215068)
 
 #define AUX_MU_IER_TX_IRQEN  BIT(1)
 
-#define AUX_MU_IIR_RX_IRQ     ((AUX_MU_IIR_REG & 0x07) == 0x04)
-#define AUX_MU_IIR_TX_IRQ     ((AUX_MU_IIR_REG & 0x07) == 0x02)
+#define AUX_MU_IIR_RX_IRQ     ((AUX_MU_IIR_REG & 0x06) == 0x04)
+#define AUX_MU_IIR_TX_IRQ     ((AUX_MU_IIR_REG & 0x06) == 0x02)
 
 #define AUX_MU_LSR_RX_RDY     (AUX_MU_LSR_REG & BIT(0))
 #define AUX_MU_LSR_TX_RDY     (AUX_MU_LSR_REG & BIT(5))
@@ -232,17 +325,21 @@
 // *****************************************************************************
 //                        Interrupts
 // *****************************************************************************
+typedef struct
+{
+        REG IRQBasic;        // Pending 0
+        REG Pending1;
+        REG Pending2;
+        REG FIQCtrl;
+        REG Enable1;
+        REG Enable2;
+        REG EnableBasic;
+        REG Disable1;
+        REG Disable2;
+        REG DisableBasic;
+} BCM2835_INTC_REGS;
 
-#define IRQ_BASIC         REG(0x2000B200)
-#define IRQ_PEND1         REG(0x2000B204)
-#define IRQ_PEND2         REG(0x2000B208)
-#define IRQ_FIQ_CONTROL   REG(0x2000B210)
-#define IRQ_ENABLE1       REG(0x2000B210)
-#define IRQ_ENABLE2       REG(0x2000B214)
-#define IRQ_ENABLE_BASIC  REG(0x2000B218)
-#define IRQ_DISABLE1      REG(0x2000B21C)
-#define IRQ_DISABLE2      REG(0x2000B220)
-#define IRQ_DISABLE_BASIC REG(0x2000B220)
+#define INTC_REGS  ((volatile BCM2835_INTC_REGS *) (0x2000B200))
 
 #define SPI_IRQ           BIT(22)
 
@@ -251,14 +348,14 @@
 // *****************************************************************************
 
 struct bscdevice_t {
-  volatile unsigned int control;
-  volatile unsigned int status; 
-  volatile unsigned int dataLength;
-  volatile unsigned int slaveAddress;
-  volatile unsigned int dataFifo;
-  volatile unsigned int clockDivider;
-  volatile unsigned int dataDelay;
-  volatile unsigned int clockStretchTimeout;
+	volatile unsigned int control;
+	volatile unsigned int status;
+	volatile unsigned int dataLength;
+	volatile unsigned int slaveAddress;
+	volatile unsigned int dataFifo;
+	volatile unsigned int clockDivider;
+	volatile unsigned int dataDelay;
+	volatile unsigned int clockStretchTimeout;
 };
 
 typedef struct bscdevice_t bscdevice_t;
@@ -308,12 +405,12 @@ typedef struct bscdevice_t bscdevice_t;
 // *****************************************************************************
 
 /// See 10.5 SPI Register Map
-#define SPI0_CS        REG(0x20204000) /* @brief SPI Master Control and Status.*/
-#define SPI0_FIFO      REG(0x20204004) /* @brief SPI Master TX and RX FIFOs.*/
-#define SPI0_CLK       REG(0x20204008) /* @brief SPI Master Clock Divider.*/
-#define SPI0_DLEN      REG(0x2020400C) /* @brief SPI Master Data Length.*/
-#define SPI0_LTOH      REG(0x20204010) /* @brief SPI LOSSI mode TOH.*/
-#define SPI0_DC        REG(0x20204014) /* @brief SPI DMA DREQ Controls.*/
+#define SPI0_CS        REG_PTR(0x20204000) /* @brief SPI Master Control and Status.*/
+#define SPI0_FIFO      REG_PTR(0x20204004) /* @brief SPI Master TX and RX FIFOs.*/
+#define SPI0_CLK       REG_PTR(0x20204008) /* @brief SPI Master Clock Divider.*/
+#define SPI0_DLEN      REG_PTR(0x2020400C) /* @brief SPI Master Data Length.*/
+#define SPI0_LTOH      REG_PTR(0x20204010) /* @brief SPI LOSSI mode TOH.*/
+#define SPI0_DC        REG_PTR(0x20204014) /* @brief SPI DMA DREQ Controls.*/
 
 // Register masks for SPI0_CS
 #define SPI_CS_LEN_LONG             0x02000000 /* @brief Enable Long data word in Lossi mode if DMA_LEN is set.*/
@@ -347,14 +444,14 @@ typedef struct bscdevice_t bscdevice_t;
 //                  Pulse Width Modulation (PWM)
 // *****************************************************************************
 
-#define PWM_CTL        REG(0x2020C000)
-#define PWM_STATUS     REG(0x2020C004)
+#define PWM_CTL        REG_PTR(0x2020C000)
+#define PWM_STATUS     REG_PTR(0x2020C004)
 
-#define PWM0_RANGE     REG(0x2020C010)
-#define PWM0_DATA      REG(0x2020C014)
+#define PWM0_RANGE     REG_PTR(0x2020C010)
+#define PWM0_DATA      REG_PTR(0x2020C014)
 
-#define PWM1_RANGE     REG(0x2020C020)
-#define PWM1_DATA      REG(0x2020C024)
+#define PWM1_RANGE     REG_PTR(0x2020C020)
+#define PWM1_DATA      REG_PTR(0x2020C024)
 
 #define PWM0_ENABLE    BIT(0)
 #define PWM0_MODE_MS   BIT(7)
@@ -366,16 +463,16 @@ typedef struct bscdevice_t bscdevice_t;
 
 #define GPIO_CLK_PWD   0x5a000000
 
-#define GPIO0_CLK_CTL  REG(0x201010A0)
-#define GPIO0_CLK_DIV  REG(0x201010A4)
+#define GPIO0_CLK_CTL  REG_PTR(0x201010A0)
+#define GPIO0_CLK_DIV  REG_PTR(0x201010A4)
 
 // *****************************************************************************
-//       Power Management, Reset controller and Watchdog registers 
+//       Power Management, Reset controller and Watchdog registers
 // *****************************************************************************
 
-#define PM_BASE                  (0x20100000) 
-#define PM_RSTC                  REG(PM_BASE+0x1c)
-#define PM_WDOG                  REG(PM_BASE+0x24)
+#define PM_BASE                  REG_PTR(0x20100000)
+#define PM_RSTC                  REG_PTR(PM_BASE+0x1c)
+#define PM_WDOG                  REG_PTR(PM_BASE+0x24)
 
 #define PM_WDOG_RESET            0000000000
 #define PM_PASSWORD              0x5a000000
@@ -388,16 +485,17 @@ typedef struct bscdevice_t bscdevice_t;
 // *****************************************************************************
 //                 Support Functions
 // *****************************************************************************
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  void bcm2835_gpio_fnsel(uint32_t gpio_pin, uint32_t gpio_function);
-  void bcm2835_delay(uint32_t n);
-
+void bcm2835_gpio_fnsel(uint8_t gpio_pin, uint8_t gpio_function);
+void bcm2835_delay(uint32_t n);
+void set_gpio_direction(uint8_t pin_nr, uint8_t dir);
+void set_gpio(uint8_t pin_nr, uint8_t pinVal);
+uint32_t read_gpio(uint8_t pin_nr);
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif

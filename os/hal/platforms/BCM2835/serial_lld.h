@@ -106,10 +106,10 @@ extern "C" {
 
   void sd_lld_serve_interrupt( SerialDriver *sdp );
 
-  void mini_uart_send ( uint32_t );
-  uint32_t mini_uart_recv ( void );
-  void mini_uart_sendhex ( uint32_t value, bool_t newline );
-  void mini_uart_sendstr (const char *s);
+  void uart_send ( uint8_t );
+  uint8_t uart_recv ( void );
+  void uart_sendhex ( uint32_t value, bool_t newline );
+  void uart_sendstr (const char *s);
 #ifdef __cplusplus
 }
 #endif

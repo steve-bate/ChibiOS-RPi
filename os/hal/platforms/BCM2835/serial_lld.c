@@ -213,13 +213,13 @@ void uart_send(uint8_t c) {
 	UART0_DR = c;
 }
 
-void mini_uart_sendstr(const char *s) {
+void uart_sendstr(const char *s) {
 	char c;
 	while ((c = *s++))
-		mini_uart_send(c);
+		uart_send(c);
 }
 
-void mini_uart_sendhex(uint32_t d, bool_t newline) {
+void uart_sendhex(uint32_t d, bool_t newline) {
 	uint32_t rb;
 	uint32_t rc;
 
@@ -231,16 +231,16 @@ void mini_uart_sendhex(uint32_t d, bool_t newline) {
 			rc += 0x37;
 		else
 			rc += 0x30;
-		mini_uart_send(rc);
+		uart_send(rc);
 		if (rb == 0)
 			break;
 	}
 
-	mini_uart_send(0x20);
+	uart_send(0x20);
 
 	if (newline) {
-		mini_uart_send(0x0D);
-		mini_uart_send(0x0A);
+		uart_send(0x0D);
+		uart_send(0x0A);
 	}
 }
 

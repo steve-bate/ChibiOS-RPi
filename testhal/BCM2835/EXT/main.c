@@ -37,6 +37,7 @@ static msg_t Thread1(void *p)
 	return 0;
 }
 
+
 static void GPIO25Callback(EXTDriver *extp, expchannel_t channel)
 {
 	UNUSED(extp);

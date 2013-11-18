@@ -85,7 +85,7 @@ void enable_gpio_detect(uint8_t pin_nr, uint8_t type)
 	}
 }
 /*
- *FIXME: Something wrong with the enable
+ *
  */
 void enable_bank_interrupt(uint8_t pin_nr)
 {
@@ -94,7 +94,7 @@ void enable_bank_interrupt(uint8_t pin_nr)
 }
 
 /*
- *FIXME: Something wrong with the disable
+ *
  */
 void disable_bank_interrupt(uint8_t pin_nr)
 {

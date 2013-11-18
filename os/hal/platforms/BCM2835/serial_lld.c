@@ -58,7 +58,7 @@ static const SerialConfig default_config = { 115200 /* default baud rate */
 static void output_notify(GenericQueue *qp) {
 	UNUSED(qp);
 	/* Enable tx interrupts.*/
-	UART0_IMSC |= 0x0020;
+	UART->IMSC.BIT.BIT5 = 1;
 }
 
 /*===========================================================================*/
@@ -68,41 +68,42 @@ static void output_notify(GenericQueue *qp) {
 void sd_lld_serve_interrupt(SerialDriver *sdp) {
 
 	//Checking whether is it UART IRQ request
-	if (IRQ_PEND2 & BIT(24)) {
+	if (INTC_REGS->Pending2.BIT.BIT24) {
+
 		//Checking where does it come from the IRQ
-		if (UART0_MIS & BIT(4)) {
+		if (UART->MIS.BIT.BIT4) {
 			chSysLockFromIsr()
 			;
 			//Reading data until the FIOF is empty
-			while (!(UART0_FR & BIT(4))) {
+			while (!(UART0_FR->BIT.BIT4)) {
 				//FIXME: The size of the buffer need to be checked
-				sdIncomingDataI(sdp, UART0_DR);
+				sdIncomingDataI(sdp, UART0_DR->REG);
 			}
 			//Clearing the RX interruption flag
-			UART0_ICR &= ~0x0010;
+			UART->ICR.BIT.BIT4 = 0;
 			chSysUnlockFromIsr();
 		}
 
 		//Checking where does it come from the IRQ
-		if ((UART0_MIS & BIT(5))) {
+		if (UART->MIS.BIT.BIT5) {
 			chSysLockFromIsr()
 			;
 
 			//Sending the data until the FIFO is full or no more data
-			while (!(UART0_FR & BIT(5))) {
+			while (!(UART0_FR->BIT.BIT5)) {
 				msg_t data = sdRequestDataI(sdp);
 				//FIXME: What if I am sending Q_OK?
 				if (data < Q_OK) {
 					/* Disable TX interrupts.*/
-					UART0_IMSC &= ~0x0020;
+					UART->IMSC.BIT.BIT5 = 0;
 					//No more date, breaking out
 					break;
 				} else {
-					UART0_DR = data;
+					UART0_DR->REG = data;
 				}
 			}
 			//Clear the TX interrupt flag
-			UART0_ICR &= ~0x0020;
+			UART->ICR.BIT.BIT5 = 0;
 			chSysUnlockFromIsr();
 		}
 	}
@@ -138,48 +139,46 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 		config = &default_config;
 
 	uint32_t ra;
+	INTC_REGS->Disable2.BIT.BIT24 = 1;
 
-	IRQ_DISABLE2 |= BIT(24);
+	UART->CR.REG = 0;
 
-	UART0_CR = 0;
-
-	ra = GPIO_REGS.GPFSEL[1];
+	ra = GPIO_REGS->GPFSEL[1].REG;
 	ra &= ~(7 << 12);
 	ra |= 4 << 12;
-	GPIO_REGS.GPFSEL[1] = ra;
+	GPIO_REGS->GPFSEL[1].REG = ra;
 
 	//bcm2835_gpio_fnsel(14, GPFN_IN);
 	//bcm2835_gpio_fnsel(15, GPFN_IN);
 
-	GPIO_REGS.GPPUD[0] = 0;
+	GPIO_REGS->GPPUD[0].REG = 0;
 
 	bcm2835_delay(150);
-	GPIO_REGS.GPPUDCLK[0] = (3 << 14);
+	GPIO_REGS->GPPUDCLK[0].REG = (3 << 14);
 	bcm2835_delay(150);
 
-	GPIO_REGS.GPPUDCLK[0] = 0;
+	GPIO_REGS->GPPUDCLK[0].REG = 0;
 
 	//Clearing the interruptions
-	UART0_ICR = 0x7FF;
+	UART->ICR.REG = 0x7FF;
 
 	//Setting the baud rate
 	ra = (UART_CLOCK << 2) / (config->baud_rate);
-	UART0_IBRD = ra >> 6;
-	UART0_FBRD = ra & 0x3F;
+	UART->IBRD.REG = ra >> 6;
+	UART->FBRD.REG = ra & 0x3F;
 
 	//4bit is enabling the FIFO, 6:5bits-8bit data
-	UART0_LCRH = 0x70;
+	UART->LCRH.REG = 0x70;
 
 	//Enable the RX interruption. (4,5 is the RX,TX interruption enable bits)
-	UART0_IMSC = 0x0030;
+	UART->IMSC.REG = 0x0030;
 
 	//8,9bits enable TX,RX, 0bit-enable UART
 
-	UART0_CR = 0x301;
+	UART->CR.REG = 0x301;
 
 	//Enable UART IRQS
-	IRQ_ENABLE2 |= BIT(24);
-
+	INTC_REGS->Enable2.BIT.BIT24 = 1;
 }
 
 /**
@@ -193,24 +192,24 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  */
 void sd_lld_stop(SerialDriver *sdp) {
 	UNUSED(sdp);
-	IRQ_DISABLE2 |= BIT(24);
-	UART0_IMSC = 0x0000;
+	INTC_REGS->Disable2.BIT.BIT24 = 1;
+	UART->IMSC.REG = 0x0000;
 }
 
 uint8_t uart_recv(void) {
 	while (1) {
-		if (!(UART0_FR & BIT(4)))
+		if (!(UART0_FR->BIT.BIT4))
 			break;
 	}
-	return UART0_DR;
+	return UART0_DR->REG;
 }
 
 void uart_send(uint8_t c) {
 	while (1) {
-		if (!(UART0_FR & BIT(5)))
+		if (!(UART0_FR->BIT.BIT5))
 			break;
 	}
-	UART0_DR = c;
+	UART0_DR->REG = c;
 }
 
 void uart_sendstr(const char *s) {

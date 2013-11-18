@@ -63,22 +63,22 @@ void enable_gpio_detect(uint8_t pin_nr, uint8_t type)
 	switch (type)
 	{
 		case DETECT_RISING:
-		GPIO_REGS .GPREN[offset] |= mask;
+		GPIO_REGS ->GPREN[offset].REG |= mask;
 		break;
 		case DETECT_FALLING:
-		GPIO_REGS .GPFEN[offset] |= mask;
+		GPIO_REGS ->GPFEN[offset].REG |= mask;
 		break;
 		case DETECT_HIGH:
-		GPIO_REGS .GPHEN[offset] |= mask;
+		GPIO_REGS ->GPHEN[offset].REG |= mask;
 		break;
 		case DETECT_LOW:
-		GPIO_REGS .GPLEN[offset] |= mask;
+		GPIO_REGS ->GPLEN[offset].REG |= mask;
 		break;
 		case DETECT_RISING_ASYNC:
-		GPIO_REGS .GPAREN[offset] |= mask;
+		GPIO_REGS ->GPAREN[offset].REG |= mask;
 		break;
 		case DETECT_FALLING_ASYNC:
-		GPIO_REGS .GPAFEN[offset] |= mask;
+		GPIO_REGS ->GPAFEN[offset].REG |= mask;
 		break;
 		case DETECT_NONE:
 		break;
@@ -90,7 +90,7 @@ void enable_gpio_detect(uint8_t pin_nr, uint8_t type)
 void enable_bank_interrupt(uint8_t pin_nr)
 {
 	uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 |= 1 <<(17+offset);
+	INTC_REGS->Enable2.REG |= 1 <<(17+offset);
 }
 
 /*
@@ -99,7 +99,7 @@ void enable_bank_interrupt(uint8_t pin_nr)
 void disable_bank_interrupt(uint8_t pin_nr)
 {
 	uint32_t offset = pin_nr / 32;
-	IRQ_ENABLE2 ^= 1 <<(17+offset);
+	INTC_REGS->Disable2.REG |= 1 <<(17+offset);
 
 }
 /*
@@ -110,7 +110,7 @@ void clear_gpio_interrupt(uint8_t pin_nr)
 	uint32_t mask = (1 << (pin_nr % 32));
 	uint32_t offset = pin_nr / 32;
 
-	GPIO_REGS .GPEDS[offset] = mask;
+	GPIO_REGS ->GPEDS[offset].REG = mask;
 }
 
 /*
@@ -125,7 +125,7 @@ uint32_t detect_gpio_interrupt(uint8_t pin_nr)
 	uint32_t mask = (1 << (pin_nr % 32));
 	uint32_t offset = pin_nr / 32;
 
-	return GPIO_REGS .GPEDS[offset] & mask;
+	return GPIO_REGS ->GPEDS[offset].REG & mask;
 }
 /*
  *

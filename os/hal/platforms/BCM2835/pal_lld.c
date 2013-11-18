@@ -53,11 +53,11 @@ gpio_port_t IOPORT1;
 
 static void set_gpio_pud(ioportid_t port, ioportmask_t mask, uint32_t pud_mode) {
 	// pg. 101 BCM2835 ARM Peripherals Reference
-	GPIO_REGS.GPPUD[0] = pud_mode;
+	GPIO_REGS->GPPUD[0].REG = pud_mode;
 	bcm2835_delay(150);
 	*port->gppudclk = mask;
 	bcm2835_delay(150);
-	GPIO_REGS.GPPUD[0] = 0;
+	GPIO_REGS->GPPUD[0].REG = 0;
 	*port->gppudclk = 0;
 }
 
@@ -83,33 +83,33 @@ void _pal_lld_init(const PALConfig* config) {
 
 	(void) config;
 
-	IOPORT0.gpset = &GPIO_REGS.GPSET[0];
-	IOPORT0.gpclr = &GPIO_REGS.GPCLR[0];
-	IOPORT0.gplev = &GPIO_REGS.GPLEV[0];
-	IOPORT0.gppudclk = &GPIO_REGS.GPPUDCLK[0];
+	IOPORT0.gpset = &GPIO_REGS->GPSET[0].REG;
+	IOPORT0.gpclr = &GPIO_REGS->GPCLR[0].REG;
+	IOPORT0.gplev = &GPIO_REGS->GPLEV[0].REG;
+	IOPORT0.gppudclk = &GPIO_REGS->GPPUDCLK[0].REG;
 
-	IOPORT0.gpeds = &GPIO_REGS.GPEDS[0];
-	IOPORT0.gpren = &GPIO_REGS.GPREN[0];
-	IOPORT0.gpfen = &GPIO_REGS.GPFEN[0];
-	IOPORT0.gphen = &GPIO_REGS.GPHEN[0];
-	IOPORT0.gplen = &GPIO_REGS.GPLEN[0];
-	IOPORT0.gparen = &GPIO_REGS.GPAREN[0];
-	IOPORT0.gpfen = &GPIO_REGS.GPAFEN[0];
+	IOPORT0.gpeds = &GPIO_REGS->GPEDS[0].REG;
+	IOPORT0.gpren = &GPIO_REGS->GPREN[0].REG;
+	IOPORT0.gpfen = &GPIO_REGS->GPFEN[0].REG;
+	IOPORT0.gphen = &GPIO_REGS->GPHEN[0].REG;
+	IOPORT0.gplen = &GPIO_REGS->GPLEN[0].REG;
+	IOPORT0.gparen = &GPIO_REGS->GPAREN[0].REG;
+	IOPORT0.gpfen = &GPIO_REGS->GPAFEN[0].REG;
 
 	set_gpio_in(&IOPORT0, 0xFFFFFFFF);
 
-	IOPORT1.gpset = &GPIO_REGS.GPSET[1];
-	IOPORT1.gpclr = &GPIO_REGS.GPCLR[1];
-	IOPORT1.gplev = &GPIO_REGS.GPLEV[1];
-	IOPORT1.gppudclk = &GPIO_REGS.GPPUDCLK[1];
+	IOPORT1.gpset = &GPIO_REGS->GPSET[1].REG;
+	IOPORT1.gpclr = &GPIO_REGS->GPCLR[1].REG;
+	IOPORT1.gplev = &GPIO_REGS->GPLEV[1].REG;
+	IOPORT1.gppudclk = &GPIO_REGS->GPPUDCLK[1].REG;
 
-	IOPORT1.gpeds = &GPIO_REGS.GPEDS[1];
-	IOPORT1.gpren = &GPIO_REGS.GPREN[1];
-	IOPORT1.gpfen = &GPIO_REGS.GPFEN[1];
-	IOPORT1.gphen = &GPIO_REGS.GPHEN[1];
-	IOPORT1.gplen = &GPIO_REGS.GPLEN[1];
-	IOPORT1.gparen = &GPIO_REGS.GPAREN[1];
-	IOPORT1.gpfen = &GPIO_REGS.GPAFEN[1];
+	IOPORT1.gpeds = &GPIO_REGS->GPEDS[1].REG;
+	IOPORT1.gpren = &GPIO_REGS->GPREN[1].REG;
+	IOPORT1.gpfen = &GPIO_REGS->GPFEN[1].REG;
+	IOPORT1.gphen = &GPIO_REGS->GPHEN[1].REG;
+	IOPORT1.gplen = &GPIO_REGS->GPLEN[1].REG;
+	IOPORT1.gparen = &GPIO_REGS->GPAREN[1].REG;
+	IOPORT1.gpfen = &GPIO_REGS->GPAFEN[1].REG;
 
 	IOPORT1.pin_base = 32;
 	set_gpio_in(&IOPORT1, 0xFFFFFFFF);

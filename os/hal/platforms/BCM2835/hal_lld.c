@@ -52,14 +52,14 @@
  */
 static void systimer_init(void) {
 	// 1 MHz clock, Counter=1000, 1 ms tick
-	ARM_TIMER_CTL = 0x003E0000;
-	ARM_TIMER_LOD = 1000 - 1;
-	ARM_TIMER_RLD = 1000 - 1;
-	ARM_TIMER_DIV = 0x000000F9;
-	ARM_TIMER_CLI = 0;
-	ARM_TIMER_CTL = 0x003E00A2;
+	ARM_TIMER_CTL->REG = 0x003E0000;
+	ARM_TIMER_LOD->REG = 1000 - 1;
+	ARM_TIMER_RLD->REG = 1000 - 1;
+	ARM_TIMER_DIV->REG = 0x000000F9;
+	ARM_TIMER_CLI->REG = 0;
+	ARM_TIMER_CTL->REG = 0x003E00A2;
 
-	IRQ_ENABLE_BASIC |= 1;
+	INTC_REGS->IRQBasic.BIT.BIT0 = 1;
 }
 
 /**
@@ -69,7 +69,7 @@ static void systimer_init(void) {
  */
 static void systimer_serve_interrupt(void) {
 
-	if (IRQ_BASIC & BIT(0)) {
+	if (INTC_REGS->IRQBasic.BIT.BIT0) {
 		// Update the system time
 		chSysLockFromIsr()
 		;
@@ -77,7 +77,7 @@ static void systimer_serve_interrupt(void) {
 		chSysUnlockFromIsr();
 
 		// Clear timer interrupt
-		ARM_TIMER_CLI = 0;
+		ARM_TIMER_CLI->REG = 0;
 	}
 }
 
@@ -125,8 +125,8 @@ static void systimer_serve_interrupt(void) {
  *
  */
 void delayMicroseconds(uint32_t n) {
-	uint32_t compare = SYSTIMER_CLO + n;
-	while (SYSTIMER_CLO < compare)
+	uint32_t compare = SYSTIMER_CLO->REG + n;
+	while (SYSTIMER_CLO->REG < compare)
 		;
 }
 
@@ -144,28 +144,28 @@ void hal_lld_init(void) {
  */
 void watchdog_start(uint32_t timeout) {
 	/* Setup watchdog for reset */
-	uint32_t pm_rstc = PM_RSTC;
+	uint32_t pm_rstc = PM_RSTC->REG;
 
 	//* watchdog timer = timer clock / 16; need password (31:16) + value (11:0) */
 	uint32_t pm_wdog = PM_PASSWORD | (timeout & PM_WDOG_TIME_SET);
 	pm_rstc = PM_PASSWORD | (pm_rstc & PM_RSTC_WRCFG_CLR)
 			| PM_RSTC_WRCFG_FULL_RESET;
-	PM_WDOG = pm_wdog;
-	PM_RSTC = pm_rstc;
+	PM_WDOG->REG = pm_wdog;
+	PM_RSTC->REG = pm_rstc;
 }
 
 /**
  * @brief Start watchdog timer
  */
 void watchdog_stop(void) {
-	PM_RSTC = PM_PASSWORD | PM_RSTC_RESET;
+	PM_RSTC->REG = PM_PASSWORD | PM_RSTC_RESET;
 }
 
 /**
  * @brief Get remaining watchdog time.
  */
 uint32_t watchdog_get_remaining(void) {
-	return PM_WDOG & PM_WDOG_TIME_SET;
+	return PM_WDOG->REG & PM_WDOG_TIME_SET;
 }
 
 /** @} */

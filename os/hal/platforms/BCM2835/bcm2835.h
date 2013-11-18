@@ -48,8 +48,8 @@ struct BITS
 
 typedef union
 {
-	uint32_t all;
-	struct BITS bit;
+	uint32_t REG;
+	struct BITS BIT;
 } REG;
 
 // *****************************************************************************
@@ -271,26 +271,27 @@ typedef struct {
 //
 
 #define UART_CLOCK 3000000
-#define UART0_BASE   ((volatile uint32_t *)0x20201000UL)
+#define UART0_BASE   ((volatile unsigned long *)0x20201000UL)
 
-#define UART0_DR     REG_PTR(UART0_BASE)
-#define UART0_RSRECR REG_PTR(UART0_BASE + 1)
-#define UART0_FR     REG_PTR(UART0_BASE + 6)
-#define UART0_ILPR   REG_PTR(UART0_BASE + 8)
-#define UART0_IBRD   REG_PTR(UART0_BASE + 9)
-#define UART0_FBRD   REG_PTR(UART0_BASE + 10)
-#define UART0_LCRH   REG_PTR(UART0_BASE + 11)
-#define UART0_CR     REG_PTR(UART0_BASE + 12)
-#define UART0_IFLS   REG_PTR(UART0_BASE + 13)
-#define UART0_IMSC   REG_PTR(UART0_BASE + 14)
-#define UART0_RIS    REG_PTR(UART0_BASE + 15)
-#define UART0_MIS    REG_PTR(UART0_BASE + 16)
-#define UART0_ICR    REG_PTR(UART0_BASE + 17)
-#define UART0_DMACR  REG_PTR(UART0_BASE + 18)
-#define UART0_ITCR   REG_PTR(UART0_BASE + 32)
-#define UART0_ITIP   REG_PTR(UART0_BASE + 33)
-#define UART0_ITOP   REG_PTR(UART0_BASE + 34)
-#define UART0_TDR    REG_PTR(UART0_BASE + 35)
+typedef struct
+{
+        REG IBRD;
+        REG FBRD;
+        REG LCRH;
+        REG CR;
+        REG IFLS;
+        REG IMSC;
+        REG RIS;
+        REG MIS;
+        REG ICR;
+        REG DMACR;
+} BCM2835_UART;
+
+
+#define UART  ((volatile BCM2835_UART *) (0x20201024UL))
+
+#define UART0_DR     REG_PTR(0x20201000UL)
+#define UART0_FR     REG_PTR(0x20201018UL)
 
 
 
@@ -324,17 +325,21 @@ typedef struct {
 // *****************************************************************************
 //                        Interrupts
 // *****************************************************************************
+typedef struct
+{
+        REG IRQBasic;        // Pending 0
+        REG Pending1;
+        REG Pending2;
+        REG FIQCtrl;
+        REG Enable1;
+        REG Enable2;
+        REG EnableBasic;
+        REG Disable1;
+        REG Disable2;
+        REG DisableBasic;
+} BCM2835_INTC_REGS;
 
-#define IRQ_BASIC         REG_PTR(0x2000B200)
-#define IRQ_PEND1         REG_PTR(0x2000B204)
-#define IRQ_PEND2         REG_PTR(0x2000B208)
-#define IRQ_FIQ_CONTROL   REG_PTR(0x2000B210)
-#define IRQ_ENABLE1       REG_PTR(0x2000B210)
-#define IRQ_ENABLE2       REG_PTR(0x2000B214)
-#define IRQ_ENABLE_BASIC  REG_PTR(0x2000B218)
-#define IRQ_DISABLE1      REG_PTR(0x2000B21C)
-#define IRQ_DISABLE2      REG_PTR(0x2000B220)
-#define IRQ_DISABLE_BASIC REG_PTR(0x2000B220)
+#define INTC_REGS  ((volatile BCM2835_INTC_REGS *) (0x2000B200))
 
 #define SPI_IRQ           BIT(22)
 
@@ -465,7 +470,7 @@ typedef struct bscdevice_t bscdevice_t;
 //       Power Management, Reset controller and Watchdog registers
 // *****************************************************************************
 
-#define PM_BASE                  (0x20100000)
+#define PM_BASE                  REG_PTR(0x20100000)
 #define PM_RSTC                  REG_PTR(PM_BASE+0x1c)
 #define PM_WDOG                  REG_PTR(PM_BASE+0x24)
 

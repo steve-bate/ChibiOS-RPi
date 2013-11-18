@@ -58,7 +58,7 @@ static const SerialConfig default_config = { 115200 /* default baud rate */
 static void output_notify(GenericQueue *qp) {
 	UNUSED(qp);
 	/* Enable tx interrupts.*/
-
+	UART0_IMSC |= 0x0020;
 }
 
 /*===========================================================================*/
@@ -70,35 +70,39 @@ void sd_lld_serve_interrupt(SerialDriver *sdp) {
 	//Checking whether is it UART IRQ request
 	if (IRQ_PEND2 & BIT(24)) {
 		//Checking where does it come from the IRQ
-		if (UART0_FR & BIT(4)) {
+		if (UART0_MIS & BIT(4)) {
 			chSysLockFromIsr()
 			;
-			while (!UART0_FR.bit.BIT4) {
+			//Reading data until the FIOF is empty
+			while (!(UART0_FR & BIT(4))) {
 				//FIXME: The size of the buffer need to be checked
-				sdIncomingDataI(sdp, uart_recv());
+				sdIncomingDataI(sdp, UART0_DR);
 			}
 			//Clearing the RX interruption flag
-			UART0_ICR ^= 0x0020;
+			UART0_ICR &= ~0x0010;
 			chSysUnlockFromIsr();
 		}
 
 		//Checking where does it come from the IRQ
-		if ((UART0_FR & BIT(5))) {
+		if ((UART0_MIS & BIT(5))) {
 			chSysLockFromIsr()
 			;
 
-			//Sending the data until the FIFO is full
-			while (!UART0_FR.bit.BIT5) {
+			//Sending the data until the FIFO is full or no more data
+			while (!(UART0_FR & BIT(5))) {
 				msg_t data = sdRequestDataI(sdp);
+				//FIXME: What if I am sending Q_OK?
 				if (data < Q_OK) {
-					/* Disable tx interrupts.*/
+					/* Disable TX interrupts.*/
+					UART0_IMSC &= ~0x0020;
+					//No more date, breaking out
 					break;
 				} else {
-					uart_send((uint8_t) data);
+					UART0_DR = data;
 				}
 			}
 			//Clear the TX interrupt flag
-			UART0_ICR ^= 0x0010;
+			UART0_ICR &= ~0x0020;
 			chSysUnlockFromIsr();
 		}
 	}

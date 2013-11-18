@@ -58,8 +58,6 @@ static const SerialConfig default_config = { 115200 /* default baud rate */
 static void output_notify(GenericQueue *qp) {
 	UNUSED(qp);
 	/* Enable tx interrupts.*/
-	// FIXME: Something is wrong with the register
-	//AUX_MU_IER_REG |= AUX_MU_IER_TX_IRQEN;
 
 }
 
@@ -69,32 +67,40 @@ static void output_notify(GenericQueue *qp) {
 
 void sd_lld_serve_interrupt(SerialDriver *sdp) {
 
-	if (AUX_MU_IIR_RX_IRQ) {
-		chSysLockFromIsr()
-		;
-		while (!AUX_MU_LSR_RX_RDY)
+	//Checking whether is it UART IRQ request
+	if (IRQ_PEND2 & BIT(24)) {
+		//Checking where does it come from the IRQ
+		if (UART0_FR & BIT(4)) {
+			chSysLockFromIsr()
 			;
-		while (AUX_MU_LSR_RX_RDY) {
-			sdIncomingDataI(sdp, AUX_MU_IO_REG & 0xFF);
+			while (!UART0_FR.bit.BIT4) {
+				//FIXME: The size of the buffer need to be checked
+				sdIncomingDataI(sdp, uart_recv());
+			}
+			//Clearing the RX interruption flag
+			UART0_ICR ^= 0x0020;
+			chSysUnlockFromIsr();
 		}
-		chSysUnlockFromIsr();
-	}
 
-	if (AUX_MU_IIR_TX_IRQ) {
-		chSysLockFromIsr()
-		;
-		while (!AUX_MU_LSR_TX_RDY)
+		//Checking where does it come from the IRQ
+		if ((UART0_FR & BIT(5))) {
+			chSysLockFromIsr()
 			;
-		msg_t data = sdRequestDataI(sdp);
-		if (data < Q_OK) {
-			/* Disable tx interrupts.*/
-			// FIXME: Something is wrong with the register
-			//AUX_MU_IER_REG &= ~AUX_MU_IER_TX_IRQEN;
 
-		} else {
-			mini_uart_send((uint32_t) data);
+			//Sending the data until the FIFO is full
+			while (!UART0_FR.bit.BIT5) {
+				msg_t data = sdRequestDataI(sdp);
+				if (data < Q_OK) {
+					/* Disable tx interrupts.*/
+					break;
+				} else {
+					uart_send((uint8_t) data);
+				}
+			}
+			//Clear the TX interrupt flag
+			UART0_ICR ^= 0x0010;
+			chSysUnlockFromIsr();
 		}
-		chSysUnlockFromIsr();
 	}
 }
 
@@ -124,36 +130,52 @@ void sd_lld_init(void) {
 void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 	UNUSED(sdp);
 
-	if (config == NULL )
+	if (config == NULL)
 		config = &default_config;
 
-	IRQ_DISABLE1 = BIT(29);
+	uint32_t ra;
 
-	AUX_ENABLES = 1;
+	IRQ_DISABLE2 |= BIT(24);
 
-	AUX_MU_IER_REG = 0x00;
-	AUX_MU_CNTL_REG = 0x00;
-	AUX_MU_LCR_REG = 0x03; // Bit 1 must be set
-	AUX_MU_MCR_REG = 0x00;
-	AUX_MU_IIR_REG = 0xC6;
-	AUX_MU_BAUD_REG = BAUD_RATE_COUNT(config->baud_rate);
+	UART0_CR = 0;
 
-	bcm2835_gpio_fnsel(14, GPFN_ALT5);
-	bcm2835_gpio_fnsel(15, GPFN_ALT5);
+	ra = GPIO_GPFSEL1;
+	ra &= ~(7 << 12);
+	ra |= 4 << 12;
+	GPIO_GPFSEL1 = ra;
 
-	//There are insufficient register description
-	AUX_MU_IER_REG = 0x01;
+	//bcm2835_gpio_fnsel(14, GPFN_IN);
+	//bcm2835_gpio_fnsel(15, GPFN_IN);
 
-	GPIO_REGS.GPPUD[0] = 0;
+	GPIO_GPPUD = 0;
+
 	bcm2835_delay(150);
-	GPIO_REGS.GPPUDCLK[0] = (1 << 14) | (1 << 15);
+	GPIO_GPPUDCLK0 = (3 << 14);
 	bcm2835_delay(150);
-	GPIO_REGS.GPPUDCLK[0] = 0;
 
-	AUX_MU_CNTL_REG = 0x03;
+	GPIO_GPPUDCLK0 = 0;
 
-	IRQ_ENABLE1 = BIT(29);
-	bcm2835_delay(150);
+	//Clearing the interruptions
+	UART0_ICR = 0x7FF;
+
+	//Setting the baud rate
+	ra = (UART_CLOCK << 2) / (config->baud_rate);
+	UART0_IBRD = ra >> 6;
+	UART0_FBRD = ra & 0x3F;
+
+	//4bit is enabling the FIFO, 6:5bits-8bit data
+	UART0_LCRH = 0x70;
+
+	//Enable the RX interruption. (4,5 is the RX,TX interruption enable bits)
+	UART0_IMSC = 0x0030;
+
+	//8,9bits enable TX,RX, 0bit-enable UART
+
+	UART0_CR = 0x301;
+
+	//Enable UART IRQS
+	IRQ_ENABLE2 |= BIT(24);
+
 }
 
 /**
@@ -167,22 +189,24 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  */
 void sd_lld_stop(SerialDriver *sdp) {
 	UNUSED(sdp);
-
-	IRQ_DISABLE1 |= BIT(29);
-	bcm2835_gpio_fnsel(14, GPFN_IN);
-	bcm2835_gpio_fnsel(15, GPFN_IN);
+	IRQ_DISABLE2 |= BIT(24);
+	UART0_IMSC = 0x0000;
 }
 
-uint32_t mini_uart_recv(void) {
-	while ((AUX_MU_LSR_REG & 0x01) == 0)
-		;
-	return (AUX_MU_IO_REG & 0xFF);
+uint8_t uart_recv(void) {
+	while (1) {
+		if (!(UART0_FR & BIT(4)))
+			break;
+	}
+	return UART0_DR;
 }
 
-void mini_uart_send(uint32_t c) {
-	while ((AUX_MU_LSR_REG & 0x20) == 0)
-		;
-	AUX_MU_IO_REG = c;
+void uart_send(uint8_t c) {
+	while (1) {
+		if (!(UART0_FR & BIT(5)))
+			break;
+	}
+	UART0_DR = c;
 }
 
 void mini_uart_sendstr(const char *s) {

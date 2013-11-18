@@ -223,6 +223,43 @@ typedef struct {
 #define SYSTIMER_CLOCK_FREQ 1000000
 
 // *****************************************************************************
+//                         Serial Registers
+// *****************************************************************************
+
+//Testing delete later
+#define GPIO_BASE      *((volatile uint32 *)0x20200000UL)
+
+#define GPIO_GPFSEL0    REG(&GPIO_BASE)
+#define GPIO_GPFSEL1    REG(&GPIO_BASE + 1)
+#define GPIO_GPPUD      REG(&GPIO_BASE + 37)
+#define GPIO_GPPUDCLK0  REG(&GPIO_BASE + 38)
+//
+
+#define UART_CLOCK 3000000
+#define UART0_BASE   (*((volatile uint32 *)0x20201000UL))
+
+#define UART0_DR     REG(&UART0_BASE)
+#define UART0_RSRECR REG(&UART0_BASE + 1)
+#define UART0_FR     REG(&UART0_BASE + 6)
+#define UART0_ILPR   REG(&UART0_BASE + 8)
+#define UART0_IBRD   REG(&UART0_BASE + 9)
+#define UART0_FBRD   REG(&UART0_BASE + 10)
+#define UART0_LCRH   REG(&UART0_BASE + 11)
+#define UART0_CR     REG(&UART0_BASE + 12)
+#define UART0_IFLS   REG(&UART0_BASE + 13)
+#define UART0_IMSC   REG(&UART0_BASE + 14)
+#define UART0_RIS    REG(&UART0_BASE + 15)
+#define UART0_MIS    REG(&UART0_BASE + 16)
+#define UART0_ICR    REG(&UART0_BASE + 17)
+#define UART0_DMACR  REG(&UART0_BASE + 18)
+#define UART0_ITCR   REG(&UART0_BASE + 32)
+#define UART0_ITIP   REG(&UART0_BASE + 33)
+#define UART0_ITOP   REG(&UART0_BASE + 34)
+#define UART0_TDR    REG(&UART0_BASE + 35)
+
+
+
+// *****************************************************************************
 //                         AUX Registers
 // *****************************************************************************
 

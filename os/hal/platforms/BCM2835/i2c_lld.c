@@ -103,10 +103,9 @@ static void i2c_lld_safety_timeout(void *p) {
 /*===========================================================================*/
 
 void i2c_lld_serve_interrupt(I2CDriver *i2cp) {
-  UNUSED(i2cp);
   bscdevice_t *device = i2cp->device;
   uint32_t status = device->status;
-
+  
   if (status & (BSC_CLKT | BSC_ERR)) {
     // TODO set error flags
     wakeup_isr(i2cp, RDY_RESET);
@@ -118,13 +117,15 @@ void i2c_lld_serve_interrupt(I2CDriver *i2cp) {
     device->status = BSC_CLKT | BSC_ERR | BSC_DONE;
     wakeup_isr(i2cp, RDY_OK);
   }
-  else if (status & BSC_TXW) {
-    while ((i2cp->txidx < i2cp->txbytes) && (status & BSC_TXD))
-      device->dataFifo = i2cp->txbuf[i2cp->txidx++];
-  }
-  else if (status & BSC_RXR) {
-    while ((i2cp->rxidx < i2cp->rxbytes) && (status & BSC_RXD))
-      i2cp->rxbuf[i2cp->rxidx++] = device->dataFifo;
+  else {
+    if (device->status & BSC_TXW) {
+        while ((i2cp->txidx < i2cp->txbytes) && (device->status & BSC_TXD))
+        device->dataFifo = i2cp->txbuf[i2cp->txidx++];
+    }
+    if (device->status & BSC_RXR) {
+        while ((i2cp->rxidx < i2cp->rxbytes) && (device->status & BSC_RXD))
+        i2cp->rxbuf[i2cp->rxidx++] = device->dataFifo;
+    }
   }
 }
 

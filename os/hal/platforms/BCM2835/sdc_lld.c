@@ -123,7 +123,7 @@ static int switch_clockrate(int rate, int baseclock) {
 }
 
 void sdc_lld_init(void) {
-
+    sdcObjectInit(&SDCD1);
 }
 
 

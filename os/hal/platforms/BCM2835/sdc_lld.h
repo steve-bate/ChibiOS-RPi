@@ -152,13 +152,7 @@ struct SDCDriver {
    */
   uint32_t                  dmamode;
 
-  /**
-   * @brief     Pointer to the SDIO registers block.
-   * @note      Used only for dubugging purpose.
-   */
-#if CH_DBG_ENABLE_ASSERTS
-  SDIO_TypeDef              *sdio;
-#endif
+
 };
 
 /*===========================================================================*/

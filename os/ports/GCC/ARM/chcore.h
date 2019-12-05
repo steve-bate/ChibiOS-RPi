@@ -152,9 +152,9 @@
 /*===========================================================================*/
 
 /**
- * @brief   32 bits stack and memory alignment enforcement.
+ * @brief   64 bits stack and memory alignment enforcement.
  */
-typedef uint32_t stkalign_t;
+typedef uint64_t stkalign_t;
 
 /**
  * @brief   Generic ARM register.

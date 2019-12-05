@@ -60,7 +60,7 @@ static void systimer_init( void )
   ARM_TIMER_CLI = 0;
   ARM_TIMER_CTL = 0x003E00A2;
 
-  IRQ_ENABLE_BASIC |= 1;
+  IRQ_ENABLE_BASIC = BIT(0);
 }
 
 /**

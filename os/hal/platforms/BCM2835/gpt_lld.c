@@ -71,12 +71,12 @@ static void gpt_lld_serve_driver_interrupt(GPTDriver *gptp) {
       uint32_t period = gptp->period;
       if (gptp->state == GPT_CONTINUOUS && period > 0) {
 	*(gptp->compare) += period;
-	SYSTIMER_CS |= match_mask;
+	SYSTIMER_CS = match_mask;
 	gptp->config->callback(&GPTD1);
       }
       else {
-	SYSTIMER_CS |= match_mask;
-	IRQ_DISABLE1 |= gptp->irq_mask;
+	SYSTIMER_CS = match_mask;
+	IRQ_DISABLE1 = gptp->irq_mask;
 	gptp->config->callback(&GPTD1);
 	gptp->state = GPT_READY;
       }
@@ -132,8 +132,8 @@ void gpt_lld_init(void) {
   gptObjectInit(&GPTD2);
 #endif
 
-  /* Clear all match bits.*/
-  SYSTIMER_CS |= 0x0F;
+  /* Clear match bits.*/
+  SYSTIMER_CS = SYSTIMER_CS_MATCH1 | SYSTIMER_CS_MATCH3;
 }
 
 /**
@@ -156,7 +156,7 @@ void gpt_lld_start(GPTDriver *gptp) {
  */
 void gpt_lld_stop(GPTDriver *gptp) {
   gptp->period = 0;
-  IRQ_DISABLE1 |= gptp->irq_mask;
+  IRQ_DISABLE1 = gptp->irq_mask;
 }
 
 /**
@@ -170,7 +170,7 @@ void gpt_lld_stop(GPTDriver *gptp) {
 void gpt_lld_start_timer(GPTDriver *gptp, gptcnt_t period) {
   gptp->period = period;
   *(gptp->compare) = SYSTIMER_CLO + period;
-  IRQ_ENABLE1 |= gptp->irq_mask;
+  IRQ_ENABLE1 = gptp->irq_mask;
 }
 
 /**

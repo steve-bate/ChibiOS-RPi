@@ -40,12 +40,6 @@
 /*===========================================================================*/
 
 typedef struct {
-  /**
-   * @brief   GPIO_LATCH register.
-   * @details This register represents the output latch of the GPIO port.
-   */
-  uint32_t          latch;
-
   volatile uint32_t *gpset;
   volatile uint32_t *gpclr;
   volatile uint32_t *gplev;
@@ -123,7 +117,7 @@ extern const PALConfig pal_default_config;
  *
  * @notapi
  */
-#define pal_lld_init(config) _pal_lld_init(config);
+#define pal_lld_init(config) _pal_lld_init(config)
 
 /**
  * @brief   Reads the physical I/O port states.
@@ -136,18 +130,6 @@ extern const PALConfig pal_default_config;
 #define pal_lld_readport(port) (*((port)->gplev))
 
 /**
- * @brief   Reads the output latch.
- * @details The purpose of this function is to read back the latched output
- *          value.
- *
- * @param[in] port      port identifier
- * @return              The latched logical states.
- *
- * @notapi
- */
-#define pal_lld_readlatch(port) ((port)->latch)
-
-/**
  * @brief   Writes a bits mask on a I/O port.
  *
  * @param[in] port      port identifier
@@ -156,6 +138,45 @@ extern const PALConfig pal_default_config;
  * @notapi
  */
 #define pal_lld_writeport(port, bits) _pal_lld_writeport(port, bits)
+
+/**
+ * @brief   Sets a bits mask on a I/O port.
+ * @note    The write operation is atomic on the BCM2835 architecture.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be ORed on the specified port
+ *
+ * @api
+ */
+
+#define pal_lld_setport(port, bits) do { *((port)->gpset) = (bits); } while(0)
+
+/**
+ * @brief   Clears a bits mask on a I/O port.
+ * @note    The write operation is atomic on the BCM2835 architecture.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be cleared on the specified port
+ *
+ * @api
+ */
+ 
+#define pal_lld_clearport(port, bits) do {*((port)->gpclr) = (bits); } while(0)
+ 
+
+/**
+ * @brief   Writes a group of bits.
+ *
+ * @param[in] port      port identifier
+ * @param[in] mask      group mask
+ * @param[in] offset    group bit offset within the port
+ * @param[in] bits      bits to be written. Values exceeding the group width
+ *                      are masked.
+ *
+ * @notapi
+ */
+#define pal_lld_writegroup(port, mask, offset, bits)                        \
+  _pal_lld_writegroup(port, mask, offset, bits)
 
 
 /**
@@ -184,8 +205,13 @@ extern "C" {
                              iomode_t mode);
 
   void _pal_lld_writeport(ioportid_t port, 
-  			  ioportmask_t bits);
-  						  
+                          ioportmask_t bits);
+
+  void _pal_lld_writegroup(ioportid_t port,
+                           ioportmask_t mask,
+                           uint_fast8_t offset,
+                           ioportmask_t bits);
+
 #ifdef __cplusplus
 }
 #endif

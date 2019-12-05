@@ -125,10 +125,18 @@ void _pal_lld_setgroupmode(ioportid_t port, ioportmask_t mask, uint32_t mode) {
   }
 }
 
+
 void _pal_lld_writeport(ioportid_t port, ioportmask_t bits) {
-  *(port->gpset) = port->latch = bits;
+  *(port->gpset) = bits;
   *(port->gpclr) = ~bits;
 }
+
+
+void _pal_lld_writegroup(ioportid_t port, ioportmask_t mask, uint_fast8_t offset, ioportmask_t bits) { 
+  *(port->gpclr) = (~bits & mask) << offset;
+  *(port->gpset) = (bits & mask) << offset;
+}
+
 
 #endif /* HAL_USE_PAL */
 

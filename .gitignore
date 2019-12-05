@@ -1,5 +1,7 @@
 tags
 TAGS
 *.bak
+*.o
+.DS_Store
 .dep/
 build/

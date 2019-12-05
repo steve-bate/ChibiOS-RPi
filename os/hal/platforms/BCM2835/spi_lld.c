@@ -132,7 +132,7 @@ void spi_lld_init(void) {
 void spi_lld_start(SPIDriver *spip) {
   UNUSED(spip);
 
-  IRQ_DISABLE2 |= BIT(22);
+  IRQ_DISABLE2 = BIT(22);
 
   /* This can be optimized to setting two masks.*/
   bcm2835_gpio_fnsel(7, GPFN_ALT0);   /* SPI0_CE1_N.*/
@@ -182,7 +182,7 @@ void spi_lld_start(SPIDriver *spip) {
 void spi_lld_stop(SPIDriver *spip) {
   UNUSED(spip);
 
-  IRQ_DISABLE2 |= BIT(22);
+  IRQ_DISABLE2 = BIT(22);
 
   /* This can be optimized to setting two masks.*/
   bcm2835_gpio_fnsel(7, GPFN_IN);
@@ -264,7 +264,7 @@ void spi_lld_exchange(SPIDriver *spip, size_t n,
 
   /* Enable SPI interrupts and activate transfer.*/
   SPI0_CS |=  SPI_CS_INTD | SPI_CS_INTR |  SPI_CS_TA;
-  IRQ_ENABLE2 |= BIT(22);
+  IRQ_ENABLE2 = BIT(22);
 }
 
 /**

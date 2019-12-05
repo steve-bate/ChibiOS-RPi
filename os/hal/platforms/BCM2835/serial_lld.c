@@ -158,7 +158,7 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 void sd_lld_stop(SerialDriver *sdp) {
   UNUSED(sdp);
 
-  IRQ_DISABLE1 |= BIT(29);
+  IRQ_DISABLE1 = BIT(29);
   bcm2835_gpio_fnsel(14, GPFN_IN);
   bcm2835_gpio_fnsel(15, GPFN_IN);
 }
